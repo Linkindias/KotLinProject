@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kotlinsampleapplication.Model.WeatherModel
+import com.example.kotlinsampleapplication.ViewModel.WeatherInfo
 import com.google.gson.Gson
 import java.io.File
 import java.io.FileInputStream
@@ -60,36 +61,46 @@ class TestActivity : AppCompatActivity() {
                             var weather = gson.fromJson(result, WeatherModel::class.java)
                             if (weather != null && weather.success){
                                 var newline = "\r\n"
+                                var mutableList: MutableList<WeatherInfo>  = mutableListOf()
                                 var sb = StringBuilder()
                                 sb.append(weather.records.datasetDescription + " " + weather.records.location[0].locationName + newline)
 
                                 for (status in weather.records.location[0].weatherElement) {
                                     if (status.elementName == "Wx")
                                         for(time in status.time) {
-                                            sb.append(startDate.format(sdf.parse(time.startTime)) + "~" + endDate.format(sdf.parse(time.endTime)) + " " + time.parameter.parameterName + newline)
+                                            var info = WeatherInfo()
+                                            info?.startDate = startDate.format(sdf.parse(time.startTime))
+                                            info?.endDate = endDate.format(sdf.parse(time.endTime))
+                                            info?.status = time.parameter.parameterName
+                                            mutableList.add(info)
                                         }
 
                                     if (status.elementName == "PoP")
-                                        for(time in status.time) {
-                                            sb.append(" 下雨率:" + time.parameter.parameterName + "%" + newline)
+                                        for((index, time) in status.time.withIndex()) {
+                                            mutableList[index].rainRate = time.parameter.parameterName
                                         }
 
                                     if (status.elementName == "MinT")
-                                        for(time in status.time) {
-                                            sb.append(" 溫度:" + time.parameter.parameterName +  time.parameter.parameterUnit )
+                                        for((index, time) in status.time.withIndex()) {
+                                            mutableList[index].startTemp = time.parameter.parameterName +  time.parameter.parameterUnit
                                         }
 
                                     if (status.elementName == "MaxT")
-                                        for(time in status.time) {
-                                            sb.append(" ~ " + time.parameter.parameterName +  time.parameter.parameterUnit + newline)
+                                        for((index, time) in status.time.withIndex()) {
+                                            mutableList[index].endTemp = time.parameter.parameterName +  time.parameter.parameterUnit
                                         }
 
                                     if (status.elementName == "CI")
-                                        for(time in status.time) {
-                                            sb.append(time.parameter.parameterName + newline)
+                                        for((index, time) in status.time.withIndex()) {
+                                            mutableList[index].status2 = time.parameter.parameterName
                                         }
                                 }
-
+                                for((index, weather) in mutableList.withIndex()) {
+                                    sb.append(weather.startDate + "~" + weather.endDate + newline)
+                                    sb.append(weather.status + " 下雨率:" + weather.rainRate + "%" + newline)
+                                    sb.append("溫度:" + weather.startTemp + " ~ " + weather.endTemp + newline)
+                                    sb.append(weather.status2 + newline)
+                                }
                                 editShow?.setText(sb.toString())
                             }
                         }
@@ -135,3 +146,4 @@ class TestActivity : AppCompatActivity() {
         }
     }
 }
+
