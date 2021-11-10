@@ -58,7 +58,7 @@ class TestActivity : AppCompatActivity() {
                     if (result != null) {
                         hd?.post {
                             var gson = Gson()
-                            var weather = gson.fromJson(result, WeatherModel::class.java)
+                            var weather = gson.fromJson(result.toString(), WeatherModel::class.java)
                             if (weather != null && weather.success){
                                 var newline = "\r\n"
                                 var mutableList: MutableList<WeatherInfo>  = mutableListOf()
@@ -104,7 +104,6 @@ class TestActivity : AppCompatActivity() {
                                 editShow?.setText(sb.toString())
                             }
                         }
-                        Log.i(tag, result)
                     }
                 }.start()
             }

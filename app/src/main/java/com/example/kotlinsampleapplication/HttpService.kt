@@ -9,8 +9,8 @@ import java.net.URL
 class HttpService {
     var tag: String = "HttpService"
 
-    fun sendGet(url: String): String {
-        var result: String = ""
+    fun sendGet(url: String): StringBuilder {
+        var result: StringBuilder = java.lang.StringBuilder()
         var urlConnection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
         try {
             urlConnection.requestMethod = "GET";
@@ -21,19 +21,28 @@ class HttpService {
             urlConnection.connect()
 
             val status: Int = urlConnection.responseCode
+            Log.i(tag, "status:$status")
 
-            if (status == 200)
-                result = urlConnection.inputStream.bufferedReader().readText()
+            if (status == 200){
+//                result.append(urlConnection.inputStream.bufferedReader().readText())
+                    urlConnection.inputStream.bufferedReader().use {
+                        it.lines().forEach { line ->
+                            result.append(line);
+                        }
+                    }
+            }
             else
-                result = status.toString()
+                result.append(status.toString())
         }
         catch (ex: Exception) {
-            result = ex.message.toString()
-            Log.d(tag, result)
+            result.append(ex.message.toString())
+            Log.d(tag, result.toString())
         }
         finally {
             urlConnection.disconnect();
         }
+        Log.i(tag, result.length.toString())
+        Log.i(tag, result.toString())
         return result
     }
 

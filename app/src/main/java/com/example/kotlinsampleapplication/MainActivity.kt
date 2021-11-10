@@ -1,5 +1,6 @@
 package com.example.kotlinsampleapplication
 
+import android.app.PendingIntent.getActivity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -12,6 +13,7 @@ import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
 
         if (Build.VERSION.SDK_INT >= 23) {
             val REQUEST_CODE_CONTACT = 101
@@ -30,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         val btActivity: Button = findViewById<View>(R.id.btActivity) as Button
         btActivity.setOnClickListener(listener);
 
+        val btVideo: Button = findViewById<View>(R.id.btVideo) as Button
+        btVideo.setOnClickListener(listener);
+
     }
 
     val listener = View.OnClickListener { view ->
@@ -37,6 +42,10 @@ class MainActivity : AppCompatActivity() {
         when (view.getId()) {
             R.id.btActivity -> {
                 val i = Intent(this, TestActivity::class.java)
+                startActivity(i)
+            }
+            R.id.btVideo -> {
+                val i = Intent(this, VideoActivity::class.java)
                 startActivity(i)
             }
         }
