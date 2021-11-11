@@ -1,6 +1,5 @@
 package com.example.kotlinsampleapplication
 
-import android.app.PendingIntent.getActivity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -8,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import java.util.jar.Manifest
 
 
 class MainActivity : AppCompatActivity() {
@@ -45,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(i)
             }
             R.id.btVideo -> {
-                val i = Intent(this, VideoActivity::class.java)
+                val i = Intent(this, MediaActivity::class.java)
                 startActivity(i)
             }
         }

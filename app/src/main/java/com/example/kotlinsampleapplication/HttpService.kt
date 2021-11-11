@@ -16,8 +16,8 @@ class HttpService {
             urlConnection.requestMethod = "GET";
             urlConnection.useCaches = false;
             urlConnection.allowUserInteraction = false;
-            urlConnection.connectTimeout = 60000;   //设置连接主机超时（单位：毫秒）
-            urlConnection.readTimeout = 60000;      //设置从主机读取数据超时（单位：毫秒）
+            urlConnection.connectTimeout = 60000;
+            urlConnection.readTimeout = 60000;
             urlConnection.connect()
 
             val status: Int = urlConnection.responseCode
@@ -25,11 +25,11 @@ class HttpService {
 
             if (status == 200){
 //                result.append(urlConnection.inputStream.bufferedReader().readText())
-                    urlConnection.inputStream.bufferedReader().use {
-                        it.lines().forEach { line ->
-                            result.append(line);
-                        }
+                urlConnection.inputStream.bufferedReader().use {
+                    it.lines().forEach { line ->
+                        result.append(line);
                     }
+                }
             }
             else
                 result.append(status.toString())
