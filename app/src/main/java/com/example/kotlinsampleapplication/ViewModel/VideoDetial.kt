@@ -5,4 +5,5 @@ class VideoDetial {
     var type: String = ""
     var startDate: String = ""
     var endDate: String = ""
+    var path: String = ""
 }

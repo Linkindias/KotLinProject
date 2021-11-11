@@ -2,28 +2,49 @@ package com.example.kotlinsampleapplication
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.os.*
+import android.graphics.BitmapFactory
+import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
+import android.widget.ImageView
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import com.example.kotlinsampleapplication.ViewModel.VideoInfo
 import com.google.gson.Gson
-import kotlinx.coroutines.*
 
 
-class MediaActivity : AppCompatActivity(), CoroutineScope by MainScope() {
+class MediaActivity : AppCompatActivity(), PlayReceiver.Receiver {
     var tag: String = "MediaActivity"
     var video: VideoView? = null
-    var tv: TextView? = null
+    var img: ImageView? = null
     var isStop: Boolean = false
 
-    var schedulsList: MutableList<VideoDetial> = mutableListOf()
-    var filePathList: MutableList<String> = mutableListOf()
+    var currentType: String = ""
     var currentPath: String = ""
+    var receiver: PlayReceiver? = null
+
+    override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
+//        tv?.setText(resultData.getString("progress").toString())
+
+        currentPath = resultData.getString("currentPath").toString()
+        currentType = resultData.getString("currentType").toString()
+        video?.setVisibility(View.VISIBLE);
+        img?.setVisibility(View.VISIBLE);
+
+        if (currentPath.length > 0 && currentType == "img")
+        {
+            val bitmap = BitmapFactory.decodeFile(currentPath)
+            img?.setImageBitmap(bitmap)
+            video?.setVisibility(View.INVISIBLE);
+        }
+        else if (currentPath.length > 0 && currentType == "video") {
+            video?.setVideoPath(currentPath)
+            video?.start()
+            img?.setVisibility(View.INVISIBLE);
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE; //轉橫向
@@ -31,39 +52,15 @@ class MediaActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
 
-        tv = findViewById<View>(R.id.textView) as TextView
+        receiver = PlayReceiver(Handler())
+        receiver!!.setReceiver(this)
 
-        var receiver: PlayReceiver = PlayReceiver(this,Handler())
-        val i = Intent(this, FileService::class.java)
+        val i = Intent(this, FileService::class.java) //open background service
         i.putExtra("receiver", receiver);
         startService(i)
 
-//        var videoD1 = VideoDetial()
-//        videoD1.fileName = "movie.mp4"
-//        videoD1.type = "video"
-//        videoD1.startDate = "2021-11-11 14:00:00"
-//        videoD1.endDate = "2021-11-11 14:30:00"
-//        schedulsList.add(videoD1)
-//        var videoD2 = VideoDetial()
-//        videoD2.fileName = "movie.mp4"
-//        videoD2.type = "video"
-//        videoD2.startDate = "2021-11-11 14:00:00"
-//        videoD2.endDate = "2021-11-11 14:30:00"
-//        schedulsList.add(videoD2)
-//
-//        var file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"")
-//        file.listFiles()
-//            .forEach {
-//                if(it.name.endsWith(".mp4"))
-//                    filePathList.add(it.path)
-//            }
-//
-//        video = findViewById<View>(R.id.videoView1) as VideoView
-//        if (filePathList.size > 0) {
-//            currentPath = filePathList[0]
-//            video?.setVideoPath(currentPath)
-//            video?.start()
-//        }
+        video = findViewById<View>(R.id.videoView) as VideoView
+        img = findViewById<View>(R.id.imageView) as ImageView
 
         val play: Button = findViewById<View>(R.id.btPlay) as Button
         play.setOnClickListener(listener);
@@ -77,20 +74,15 @@ class MediaActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val upload: Button = findViewById<View>(R.id.btUpload) as Button
         upload.setOnClickListener(listener);
 
-        video?.setOnCompletionListener { mp ->
-            var index = 0
-            if (filePathList.size > filePathList.indexOf(currentPath) + 1)
-                index = filePathList.indexOf(currentPath) + 1
-            else
-                index = 0
-            currentPath = filePathList[index]
-            try {
+        video?.setOnCompletionListener { mp -> //played restart
+            if (currentPath.length > 0) {
                 video?.setVideoPath(currentPath)
                 video?.start()
             }
-            catch (ex : Exception){
-                Log.i(tag, ex.message.toString())
-            }
+        }
+
+        video?.setOnPreparedListener{ mp -> //cycle play
+            mp.setLooping(true)
         }
     }
 
@@ -115,6 +107,7 @@ class MediaActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                         try {
                             var gson = Gson()
                             var video = gson.fromJson(result.toString(), VideoInfo::class.java)
+                            Log.i(tag, video.videos?.size.toString())
                         }
                         catch (ex: Exception) {
                             Log.i(tag, ex.message.toString())
@@ -124,7 +117,4 @@ class MediaActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             }
         }
     }
-
-
-//    ResultReceiver mResultReceiver = new Re
 }
