@@ -2,7 +2,9 @@ package com.example.kotlinsampleapplication
 
 import android.util.Log
 import java.io.DataOutputStream
+import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -21,10 +23,9 @@ class HttpService {
             urlConnection.connect()
 
             val status: Int = urlConnection.responseCode
-            Log.i(tag, "status:$status")
+            Log.i(tag + "sendGet", "status:$status")
 
             if (status == 200){
-//                result.append(urlConnection.inputStream.bufferedReader().readText())
                 urlConnection.inputStream.bufferedReader().use {
                     it.lines().forEach { line ->
                         result.append(line);
@@ -36,14 +37,49 @@ class HttpService {
         }
         catch (ex: Exception) {
             result.append(ex.message.toString())
-            Log.d(tag, result.toString())
+            Log.e(tag + "sendGet", result.toString())
         }
         finally {
             urlConnection.disconnect();
         }
-        Log.i(tag, result.length.toString())
-        Log.i(tag, result.toString())
         return result
+    }
+
+    fun sendGetFile(url: String, file: File):Int {
+        var status: Int = 0
+        var urlConnection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
+
+        try {
+            urlConnection.requestMethod = "GET";
+            urlConnection.useCaches = false;
+            urlConnection.allowUserInteraction = false;
+            urlConnection.connectTimeout = 60000;
+            urlConnection.readTimeout = 60000;
+            urlConnection.connect()
+
+            status = urlConnection.responseCode
+            Log.i(tag + "sendGetFile", "status:$status")
+
+            if (status == 200) {
+
+                var fos = FileOutputStream(file);
+                val inputStream = urlConnection.getInputStream();
+                var bytesRead = 0;
+                val buffer = ByteArray(1024)
+                while (inputStream.read(buffer).apply { bytesRead = this } > 0) {
+                    fos.write(buffer, 0, bytesRead);
+                }
+                fos.close();
+                inputStream.close();
+            }
+        }
+        catch (ex: Exception) {
+            Log.e(tag + "sendGetFile", ex.message.toString())
+        }
+        finally {
+            urlConnection.disconnect();
+        }
+        return status
     }
 
     fun sendPostJson(url: String, variable: String): String {
@@ -60,6 +96,7 @@ class HttpService {
             outputStream.write(variable.toByteArray(charset("UTF-8")))
 
             val status: Int = urlConnection.responseCode
+            Log.i(tag + "sendPostJson", "status:$status")
 
             if (status == 200)
                 result = urlConnection.inputStream.bufferedReader().readText()
@@ -68,7 +105,7 @@ class HttpService {
         }
         catch (ex: Exception) {
             result = ex.message.toString()
-            Log.d(tag, result)
+            Log.e(tag + "sendPostJson", result)
         }
         finally {
             urlConnection.disconnect();
@@ -93,6 +130,7 @@ class HttpService {
             outputStream.write(variable.toByteArray(charset("UTF-8")))
 
             val status: Int = urlConnection.responseCode
+            Log.i(tag + "sendPostForm", "status:$status")
 
             if (status == 200)
                 result = urlConnection.inputStream.bufferedReader().readText()
@@ -101,7 +139,7 @@ class HttpService {
         }
         catch (ex: Exception) {
             result = ex.message.toString()
-            Log.d(tag, result)
+            Log.e(tag + "sendPostJson", result)
         }
         finally {
             urlConnection.disconnect();
@@ -161,6 +199,7 @@ class HttpService {
             urlConnection.connect()
 
             val status: Int = urlConnection.responseCode
+            Log.i(tag + "sendPostMultiPart", "status:$status")
 
             if (status == 200)
                 result = urlConnection.inputStream.bufferedReader().readText()
@@ -169,7 +208,7 @@ class HttpService {
         }
         catch (ex: Exception) {
             result = ex.message.toString()
-            Log.d(tag, result)
+            Log.e(tag + "sendPostMultiPart", result)
         }
         finally {
             urlConnection.disconnect();

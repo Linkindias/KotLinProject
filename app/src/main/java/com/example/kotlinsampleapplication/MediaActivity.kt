@@ -2,47 +2,48 @@ package com.example.kotlinsampleapplication
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
+import android.os.ResultReceiver
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.kotlinsampleapplication.ViewModel.VideoInfo
-import com.google.gson.Gson
+import com.example.kotlinsampleapplication.MediaDomain.FileService
+import com.example.kotlinsampleapplication.MediaDomain.MediaPlayRunnable
+import com.example.kotlinsampleapplication.MediaDomain.MediaStopRunnable
+import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 
 
-class MediaActivity : AppCompatActivity(), PlayReceiver.Receiver {
+class MediaActivity : AppCompatActivity()  {
     var tag: String = "MediaActivity"
     var video: VideoView? = null
     var img: ImageView? = null
-    var isStop: Boolean = false
 
-    var currentType: String = ""
     var currentPath: String = ""
-    var receiver: PlayReceiver? = null
 
-    override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
-//        tv?.setText(resultData.getString("progress").toString())
+    var isStop: Boolean = false
+    var serviceIntent: Intent? = null
 
-        currentPath = resultData.getString("currentPath").toString()
-        currentType = resultData.getString("currentType").toString()
-        video?.setVisibility(View.VISIBLE);
-        img?.setVisibility(View.VISIBLE);
+    var mediaPlayRunnable: MediaPlayRunnable = MediaPlayRunnable()
+    var mediaStopRunnable: MediaStopRunnable = MediaStopRunnable()
 
-        if (currentPath.length > 0 && currentType == "img")
-        {
-            val bitmap = BitmapFactory.decodeFile(currentPath)
-            img?.setImageBitmap(bitmap)
-            video?.setVisibility(View.INVISIBLE);
-        }
-        else if (currentPath.length > 0 && currentType == "video") {
-            video?.setVideoPath(currentPath)
-            video?.start()
-            img?.setVisibility(View.INVISIBLE);
+    val receiver: ResultReceiver = object : ResultReceiver(Handler()) {
+
+        override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
+            if (resultCode == FileService.playflag) {
+                Log.i(tag + " stop:", resultData.getString("stopDate").toString())
+                Log.i(tag + " schedules:", resultData.getParcelableArrayList<VideoDetial>("schedules")?.size.toString())
+                mediaPlayRunnable.setMediaPathType(resultData.getString("currentPath").toString(),resultData.getString("currentType").toString())
+                runOnUiThread(mediaPlayRunnable);
+            }
+            else if (resultCode == FileService.stopflag) {
+                Log.i(tag + " start:", resultData.getString("startDate").toString())
+                Log.i(tag + " schedules:", resultData.getParcelableArrayList<VideoDetial>("schedules")?.size.toString())
+                runOnUiThread(mediaPlayRunnable);
+            }
         }
     }
 
@@ -52,15 +53,10 @@ class MediaActivity : AppCompatActivity(), PlayReceiver.Receiver {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
 
-        receiver = PlayReceiver(Handler())
-        receiver!!.setReceiver(this)
-
-        val i = Intent(this, FileService::class.java) //open background service
-        i.putExtra("receiver", receiver);
-        startService(i)
-
-        video = findViewById<View>(R.id.videoView) as VideoView
-        img = findViewById<View>(R.id.imageView) as ImageView
+        video = findViewById<View>(R.id.videoView1) as VideoView
+        img = findViewById<View>(R.id.imageView1) as ImageView
+        mediaPlayRunnable.setVideoControl(video!!, img!!)
+        mediaStopRunnable.setVideoControl(video!!, img!!)
 
         val play: Button = findViewById<View>(R.id.btPlay) as Button
         play.setOnClickListener(listener);
@@ -71,11 +67,9 @@ class MediaActivity : AppCompatActivity(), PlayReceiver.Receiver {
         val stop: Button = findViewById<View>(R.id.btStop) as Button
         stop.setOnClickListener(listener);
 
-        val upload: Button = findViewById<View>(R.id.btUpload) as Button
-        upload.setOnClickListener(listener);
-
         video?.setOnCompletionListener { mp -> //played restart
-            if (currentPath.length > 0) {
+
+            if (currentPath.isNotEmpty()) {
                 video?.setVideoPath(currentPath)
                 video?.start()
             }
@@ -84,12 +78,17 @@ class MediaActivity : AppCompatActivity(), PlayReceiver.Receiver {
         video?.setOnPreparedListener{ mp -> //cycle play
             mp.setLooping(true)
         }
+
+        serviceIntent = Intent(this, FileService::class.java) //open background service
+        serviceIntent!!.putExtra("receiver", receiver);
+        startService(serviceIntent)
     }
 
     val listener = View.OnClickListener { view ->
 
         when (view.getId()) {
             R.id.btPlay -> {
+
                 if (isStop) video?.setVideoPath(currentPath)
                 video?.start()
             }
@@ -100,21 +99,11 @@ class MediaActivity : AppCompatActivity(), PlayReceiver.Receiver {
                 video?.stopPlayback()
                 isStop = true
             }
-            R.id.btUpload -> {
-                Thread {
-                    var result = HttpService().sendGet("http://10.168.18.61/webapplication/api/video/FileSchedule")
-                    if (result != null) {
-                        try {
-                            var gson = Gson()
-                            var video = gson.fromJson(result.toString(), VideoInfo::class.java)
-                            Log.i(tag, video.videos?.size.toString())
-                        }
-                        catch (ex: Exception) {
-                            Log.i(tag, ex.message.toString())
-                        }
-                    }
-                }.start()
-            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopService(serviceIntent);
     }
 }
