@@ -13,8 +13,10 @@ import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kotlinsampleapplication.MediaDomain.FileService
 import com.example.kotlinsampleapplication.MediaDomain.MediaPlayRunnable
+import com.example.kotlinsampleapplication.MediaDomain.MediaService
 import com.example.kotlinsampleapplication.MediaDomain.MediaStopRunnable
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
+import java.util.ArrayList
 
 
 class MediaActivity : AppCompatActivity()  {
@@ -27,23 +29,19 @@ class MediaActivity : AppCompatActivity()  {
     var isStop: Boolean = false
     var serviceIntent: Intent? = null
 
-    var mediaPlayRunnable: MediaPlayRunnable = MediaPlayRunnable()
-    var mediaStopRunnable: MediaStopRunnable = MediaStopRunnable()
+    var mediaService: MediaService? = null
 
     val receiver: ResultReceiver = object : ResultReceiver(Handler()) {
 
         override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
-            if (resultCode == FileService.playflag) {
-                Log.i(tag + " stop:", resultData.getString("stopDate").toString())
-                Log.i(tag + " schedules:", resultData.getParcelableArrayList<VideoDetial>("schedules")?.size.toString())
-                mediaPlayRunnable.setMediaPathType(resultData.getString("currentPath").toString(),resultData.getString("currentType").toString())
-                runOnUiThread(mediaPlayRunnable);
-            }
-            else if (resultCode == FileService.stopflag) {
-                Log.i(tag + " start:", resultData.getString("startDate").toString())
-                Log.i(tag + " schedules:", resultData.getParcelableArrayList<VideoDetial>("schedules")?.size.toString())
-                runOnUiThread(mediaPlayRunnable);
-            }
+
+            mediaService?.setMediaPathType(resultCode,
+                                            resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
+                                            resultData.getString("currentPath").toString(),
+                                            resultData.getString("currentType").toString(),
+                                            resultData.getString("startDate").toString(),
+                                            resultData.getString("stopDate").toString())
+            runOnUiThread(mediaService?.runOnUiRunnable());
         }
     }
 
@@ -55,8 +53,7 @@ class MediaActivity : AppCompatActivity()  {
 
         video = findViewById<View>(R.id.videoView1) as VideoView
         img = findViewById<View>(R.id.imageView1) as ImageView
-        mediaPlayRunnable.setVideoControl(video!!, img!!)
-        mediaStopRunnable.setVideoControl(video!!, img!!)
+        mediaService = MediaService(video!!, img!!)
 
         val play: Button = findViewById<View>(R.id.btPlay) as Button
         play.setOnClickListener(listener);
