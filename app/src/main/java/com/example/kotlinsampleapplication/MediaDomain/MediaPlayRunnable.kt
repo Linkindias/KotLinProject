@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.VideoView
+import java.io.File
+import java.io.FileInputStream
 
 
 class MediaPlayRunnable: Runnable {
@@ -31,13 +33,18 @@ class MediaPlayRunnable: Runnable {
 
         try {
             if (this.path.isNotEmpty() && this.type == "img") {
-                val bitmap = BitmapFactory.decodeFile(path)
-                img?.setImageBitmap(bitmap)
+                Log.i(tag, "set img")
+                var fis = FileInputStream(File(path))
+                val bmp = BitmapFactory.decodeStream(fis)
+                img?.setImageBitmap(bmp)
+
                 video?.setVisibility(View.INVISIBLE);
             }
             else if (this.path.isNotEmpty() && this.type == "video") {
+                Log.i(tag, "set video")
                 this.video?.setVideoPath(path)
                 this.video?.start()
+
                 img?.setVisibility(View.INVISIBLE);
             }
         } catch (ex: Exception) {

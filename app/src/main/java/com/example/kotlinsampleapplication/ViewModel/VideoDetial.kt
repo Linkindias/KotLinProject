@@ -8,9 +8,10 @@ import java.util.*
 class VideoDetial : Parcelable {
     var fileName: String = ""
     var type: String = ""
+    var path: String = ""
     var startDate: String = ""
     var endDate: String = ""
     var sDate: Date? = null
     var eDate: Date? = null
-    var path: String = ""
+
 }

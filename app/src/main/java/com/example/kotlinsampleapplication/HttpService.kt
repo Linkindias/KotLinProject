@@ -23,7 +23,7 @@ class HttpService {
             urlConnection.connect()
 
             val status: Int = urlConnection.responseCode
-            Log.i(tag + "sendGet", "status:$status")
+//            Log.i(tag + "sendGet", "status:$status")
 
             if (status == 200){
                 urlConnection.inputStream.bufferedReader().use {
@@ -58,7 +58,7 @@ class HttpService {
             urlConnection.connect()
 
             status = urlConnection.responseCode
-            Log.i(tag + "sendGetFile", "status:$status")
+//            Log.i(tag + "sendGetFile", "status:$status")
 
             if (status == 200) {
 
@@ -96,7 +96,7 @@ class HttpService {
             outputStream.write(variable.toByteArray(charset("UTF-8")))
 
             val status: Int = urlConnection.responseCode
-            Log.i(tag + "sendPostJson", "status:$status")
+//            Log.i(tag + "sendPostJson", "status:$status")
 
             if (status == 200)
                 result = urlConnection.inputStream.bufferedReader().readText()
@@ -130,7 +130,7 @@ class HttpService {
             outputStream.write(variable.toByteArray(charset("UTF-8")))
 
             val status: Int = urlConnection.responseCode
-            Log.i(tag + "sendPostForm", "status:$status")
+//            Log.i(tag + "sendPostForm", "status:$status")
 
             if (status == 200)
                 result = urlConnection.inputStream.bufferedReader().readText()
@@ -199,7 +199,7 @@ class HttpService {
             urlConnection.connect()
 
             val status: Int = urlConnection.responseCode
-            Log.i(tag + "sendPostMultiPart", "status:$status")
+//            Log.i(tag + "sendPostMultiPart", "status:$status")
 
             if (status == 200)
                 result = urlConnection.inputStream.bufferedReader().readText()

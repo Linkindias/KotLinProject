@@ -6,16 +6,17 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.ResultReceiver
 import android.util.Log
+import com.example.kotlinsampleapplication.Base.Companion.sdf
+import com.example.kotlinsampleapplication.Base.Companion.sdfJson
 import com.example.kotlinsampleapplication.HttpService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import com.example.kotlinsampleapplication.ViewModel.VideoInfo
 import com.google.gson.Gson
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 
 
-class FileService : IntentService("") {
+class FileService : IntentService("single") {
     companion object {
         const val playflag = 1
         const val stopflag = 2
@@ -25,15 +26,10 @@ class FileService : IntentService("") {
     var receiver: ResultReceiver? = null
     var schedulsList: List <VideoDetial> = listOf()
 
-    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-
     override fun onHandleIntent(intent: Intent?) {
         Log.i("FileService","start")
 
-        var loadCount = 0
-
         if (schedulsList.isEmpty()) {
-
             try {
                 var schedule = HttpService().sendGet("http://10.168.18.61/webapplication/api/video/FileSchedule")
                 if (schedule != null) {
@@ -49,9 +45,8 @@ class FileService : IntentService("") {
                     schedulsList.forEach {
                         var fileName = it.fileName
                         var file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
-                        var result = HttpService().sendGetFile("http://10.168.18.61/webapplication/api/video/DownLoadFile?fileName=$fileName", file)
+                        if (!file.exists()) HttpService().sendGetFile("http://10.168.18.61/webapplication/api/video/DownLoadFile?fileName=$fileName", file)
                         it.path = file.path
-                        if (result == 200) loadCount++
                     }
                 }
             } catch (ex: Exception) {
@@ -59,36 +54,49 @@ class FileService : IntentService("") {
             }
         }
 
+        Log.i(tag,"s:" + schedulsList.size.toString())
         schedulsList.forEach {
-            it.sDate = sdf.parse(it.startDate)
-            it.eDate = sdf.parse(it.endDate)
+//            Log.i(tag,"s:" + sdf.format(sdfJson.parse(it.startDate)))
+//            Log.i(tag,"e:" + sdf.format(sdfJson.parse(it.endDate)))
+//            Log.i(tag, " p:" + it.path + " n:" + sdf.format(Date()))
+
+            it.sDate = sdfJson.parse(it.startDate)
+            it.eDate = sdfJson.parse(it.endDate)
         }
 
+        if (schedulsList.isNotEmpty()) {
+            try {
+                var dtNow = Date()
+                var currentStartSchedule: VideoDetial? = null
+                var nextStartSchedule: VideoDetial? = null
 
-        if (loadCount == schedulsList.size) {
+                schedulsList.forEach {
+                    if (it.sDate!! <= dtNow && dtNow <= it.eDate) currentStartSchedule = it
 
-            //在深的可以抽findSchedule class to 現在、下個排程
-            var currentStartSchedule = schedulsList.find { it.sDate?.compareTo(Date())!! < 0 && it.eDate?.compareTo(Date())!! > 0 }
-            var nextStartSchedule = schedulsList.find { it.sDate?.compareTo(Date())!! > 0 }
-            receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
-            val bundle = Bundle()
+                    if(dtNow < it.sDate && dtNow < it.eDate) nextStartSchedule = it
+                }
 
-            if (currentStartSchedule != null) {
-                Log.i(tag, "start < now < end")
-                bundle.putString("currentPath", currentStartSchedule.path)
-                bundle.putString("currentType", currentStartSchedule.type)
-                bundle.putString("stopDate", currentStartSchedule.endDate)
-                bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
-                receiver!!.send(playflag, bundle)
-            } else if (nextStartSchedule != null) {
-                Log.i(tag, "start > now")
-                bundle.putString("currentPath", nextStartSchedule.path)
-                bundle.putString("currentType", nextStartSchedule.type)
-                bundle.putString("startDate", nextStartSchedule.startDate)
-                bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
-                receiver!!.send(stopflag, bundle)
+                receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
+                val bundle = Bundle()
+
+                if (currentStartSchedule != null ) {
+                    Log.i(tag, "start < now < end")
+                    bundle.putString("currentPath", currentStartSchedule!!.path)
+                    bundle.putString("currentType", currentStartSchedule!!.type)
+                    bundle.putString("stopDate", currentStartSchedule!!.endDate)
+                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
+                    receiver!!.send(playflag, bundle)
+                } else if (nextStartSchedule != null ) {
+                    Log.i(tag, "start > now")
+                    bundle.putString("currentPath", nextStartSchedule!!.path)
+                    bundle.putString("currentType", nextStartSchedule!!.type)
+                    bundle.putString("startDate", nextStartSchedule!!.startDate)
+                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
+                    receiver!!.send(stopflag, bundle)
+                }
+            } catch (ex: Exception) {
+                Log.e(tag, ex.message.toString())
             }
-            Log.i(tag, "not schedules")
         }
     }
 
