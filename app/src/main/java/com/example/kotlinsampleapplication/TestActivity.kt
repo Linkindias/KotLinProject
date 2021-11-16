@@ -28,6 +28,7 @@ class TestActivity : AppCompatActivity() {
     val endDate = SimpleDateFormat(" HH:mm")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(tag,"TestActivity start")
         hs = HttpService()
         hd = Handler()
 

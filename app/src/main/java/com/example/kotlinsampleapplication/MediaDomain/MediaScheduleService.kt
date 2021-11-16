@@ -52,29 +52,36 @@ class MediaScheduleService {
     private fun findMediaStopTime(eDate: String) {
         val endDuration: Long = sdfJson.parse(eDate).time!! - Date().time
         Log.i(tag, "endDuration:$endDuration")
-        timer.schedule(endTimerTask, endDuration)
+
+        timer.schedule( object : TimerTask() {
+            override fun run() {
+                Log.i(tag, "endTimerTask call")
+                handler.post {
+                    findNextScheduleToStartDate()
+                }
+            }
+        }, endDuration)
     }
 
     private fun findMediaPlayTime(sDate: String) {
         val startDuration: Long = sdfJson.parse(sDate).time!! - Date().time
         Log.i(tag, "startDuration:$startDuration")
-        timer.schedule(startTimerTask, startDuration)
-    }
 
-    private val endTimerTask: TimerTask = object : TimerTask() {
-        override fun run() {
-            Log.i(tag, "endTimerTask call")
-            handler.post {
-                mediaStopRunnable.run()
-                timer.cancel()
-                timer.purge()
-
-                findNextScheduleToStartDate()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                Log.i(tag, "startTimerTask call")
+                handler.post {
+                    findCurrentScheduleToEndDate()
+                }
             }
-        }
+        }, startDuration)
     }
 
     private fun findNextScheduleToStartDate() {
+        mediaStopRunnable.run()
+        timer.cancel()
+        timer.purge()
+
         var nextIndex:Int = -1
 
         try {
@@ -90,28 +97,26 @@ class MediaScheduleService {
                 Log.i(tag, "startDuration:$startDuration")
 
                 timer = Timer()
-                timer.schedule(startTimerTask, startDuration)
+                timer.schedule(object : TimerTask() {
+                    override fun run() {
+                        Log.i(tag, "startTimerTask call")
+                        handler.post {
+                            findCurrentScheduleToEndDate()
+                        }
+                    }
+                }, startDuration)
             }
         } catch (ex: Exception) {
             Log.e(tag, ex.message.toString())
         }
     }
 
-    private val startTimerTask: TimerTask = object : TimerTask() {
-        override fun run() {
-            Log.i(tag, "startTimerTask call")
-            handler.post {
-                mediaPlayRunnable.setMediaPathType(path, type)
-                mediaPlayRunnable.run()
-                timer.cancel()
-                timer.purge()
-
-                findCurrentScheduleToEndDate()
-            }
-        }
-    }
-
     private fun findCurrentScheduleToEndDate() {
+        mediaPlayRunnable.setMediaPathType(path, type)
+        mediaPlayRunnable.run()
+        timer.cancel()
+        timer.purge()
+
         var currendSchedule: VideoDetial? = null
         try {
             videoSchedules.forEach {
@@ -124,7 +129,14 @@ class MediaScheduleService {
                 Log.i(tag, "endDuration:$endDuration")
 
                 timer = Timer()
-                timer.schedule(endTimerTask, endDuration)
+                timer.schedule(object : TimerTask() {
+                    override fun run() {
+                        Log.i(tag, "endTimerTask call")
+                        handler.post {
+                            findNextScheduleToStartDate()
+                        }
+                    }
+                }, endDuration)
             }
         } catch (ex: Exception) {
             Log.e(tag, ex.message.toString())

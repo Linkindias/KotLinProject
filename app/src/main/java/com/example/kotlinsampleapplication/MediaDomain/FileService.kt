@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.ResultReceiver
 import android.util.Log
-import com.example.kotlinsampleapplication.Base.Companion.sdf
 import com.example.kotlinsampleapplication.Base.Companion.sdfJson
 import com.example.kotlinsampleapplication.HttpService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
@@ -27,7 +26,8 @@ class FileService : IntentService("single") {
     var schedulsList: List <VideoDetial> = listOf()
 
     override fun onHandleIntent(intent: Intent?) {
-        Log.i("FileService","start")
+        val uuid = UUID.randomUUID()
+        Log.i("FileService", "start:$uuid")
 
         if (schedulsList.isEmpty()) {
             try {
@@ -56,10 +56,6 @@ class FileService : IntentService("single") {
 
         Log.i(tag,"s:" + schedulsList.size.toString())
         schedulsList.forEach {
-//            Log.i(tag,"s:" + sdf.format(sdfJson.parse(it.startDate)))
-//            Log.i(tag,"e:" + sdf.format(sdfJson.parse(it.endDate)))
-//            Log.i(tag, " p:" + it.path + " n:" + sdf.format(Date()))
-
             it.sDate = sdfJson.parse(it.startDate)
             it.eDate = sdfJson.parse(it.endDate)
         }

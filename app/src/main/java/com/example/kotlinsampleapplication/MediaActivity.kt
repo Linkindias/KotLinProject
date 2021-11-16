@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.ResultReceiver
 import android.util.Log
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.VideoView
@@ -15,7 +16,7 @@ import androidx.core.content.ContextCompat
 import com.example.kotlinsampleapplication.MediaDomain.FileService
 import com.example.kotlinsampleapplication.MediaDomain.MediaScheduleService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
-import java.util.ArrayList
+import java.util.*
 
 
 class MediaActivity : AppCompatActivity()  {
@@ -52,6 +53,7 @@ class MediaActivity : AppCompatActivity()  {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE; //轉橫向
 
         super.onCreate(savedInstanceState)
@@ -80,6 +82,10 @@ class MediaActivity : AppCompatActivity()  {
 
         video?.setOnPreparedListener{ mp -> //cycle play
             mp.setLooping(true)
+        }
+
+        video?.setOnTouchListener{ v, event ->  //not touch
+            true
         }
 
         serviceIntent = Intent(this, FileService::class.java) //open background service

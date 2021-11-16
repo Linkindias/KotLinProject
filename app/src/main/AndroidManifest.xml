@@ -25,7 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <service android:name=".MediaDomain.FileService" android:enabled="true" android:exported="true"></service>
+        <service android:name=".MediaDomain.FileService" android:enabled="true"></service>
         <activity android:name=".MediaActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".MainActivity">

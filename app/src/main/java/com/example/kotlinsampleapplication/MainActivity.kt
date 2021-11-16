@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
-
         if (Build.VERSION.SDK_INT >= 23) {
             val REQUEST_CODE_CONTACT = 101
             val permissions = arrayOf<String>(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -28,24 +27,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val btActivity: Button = findViewById<View>(R.id.btActivity) as Button
-        btActivity.setOnClickListener(listener);
-
+        btActivity.setOnClickListener {
+            val testActivity = Intent(this, TestActivity::class.java)
+            startActivity(testActivity)
+        }
         val btVideo: Button = findViewById<View>(R.id.btVideo) as Button
-        btVideo.setOnClickListener(listener);
-
+        btVideo.setOnClickListener {
+            val mediaActivity = Intent(this, MediaActivity::class.java)
+            startActivity(mediaActivity)
+        }
     }
 
-    val listener = View.OnClickListener { view ->
-
-        when (view.getId()) {
-            R.id.btActivity -> {
-                val i = Intent(this, TestActivity::class.java)
-                startActivity(i)
-            }
-            R.id.btVideo -> {
-                val i = Intent(this, MediaActivity::class.java)
-                startActivity(i)
-            }
-        }
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }
