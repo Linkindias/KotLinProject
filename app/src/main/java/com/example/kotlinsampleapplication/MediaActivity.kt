@@ -24,11 +24,7 @@ class MediaActivity : AppCompatActivity()  {
     var video: VideoView? = null
     var img: ImageView? = null
 
-    var currentPath: String = ""
-
-    var isStop: Boolean = false
     var serviceIntent: Intent? = null
-
     var mediaService: MediaScheduleService? = null
 
     val receiver: ResultReceiver = object : ResultReceiver(Handler()) {
@@ -63,23 +59,6 @@ class MediaActivity : AppCompatActivity()  {
         img = findViewById<View>(R.id.imageView1) as ImageView
         mediaService = MediaScheduleService(video!!, img!!, ContextCompat.getDrawable(this,R.drawable.netcore))
 
-        val play: Button = findViewById<View>(R.id.btPlay) as Button
-        play.setOnClickListener(listener);
-
-        val pause: Button = findViewById<View>(R.id.btPause) as Button
-        pause.setOnClickListener(listener);
-
-        val stop: Button = findViewById<View>(R.id.btStop) as Button
-        stop.setOnClickListener(listener);
-
-        video?.setOnCompletionListener { mp -> //played restart
-
-            if (currentPath.isNotEmpty()) {
-                video?.setVideoPath(currentPath)
-                video?.start()
-            }
-        }
-
         video?.setOnPreparedListener{ mp -> //cycle play
             mp.setLooping(true)
         }
@@ -91,24 +70,6 @@ class MediaActivity : AppCompatActivity()  {
         serviceIntent = Intent(this, FileService::class.java) //open background service
         serviceIntent!!.putExtra("receiver", receiver);
         startService(serviceIntent)
-    }
-
-    val listener = View.OnClickListener { view ->
-
-        when (view.getId()) {
-            R.id.btPlay -> {
-
-                if (isStop) video?.setVideoPath(currentPath)
-                video?.start()
-            }
-            R.id.btPause -> {
-                video?.pause()
-            }
-            R.id.btStop -> {
-                video?.stopPlayback()
-                isStop = true
-            }
-        }
     }
 
     override fun onDestroy() {

@@ -94,6 +94,7 @@ class MediaScheduleService {
                 path = videoSchedules[nextIndex].path
                 type = videoSchedules[nextIndex].type
                 val startDuration: Long = sdfJson.parse(videoSchedules[nextIndex].startDate).time!! - Date().time
+                Log.i(tag, "path:" + path + " type:" + type)
                 Log.i(tag, "startDuration:$startDuration")
 
                 timer = Timer()
