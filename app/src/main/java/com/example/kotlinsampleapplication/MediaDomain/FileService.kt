@@ -42,11 +42,6 @@ class FileService : IntentService("single") {
                 }
 
                 if (schedulsList.isNotEmpty()){
-                    val files = File(sdcardDownLoad,"")
-
-                    for (file in files.listFiles())
-                        file.delete()
-
                     schedulsList.forEach {
                         var fileName = it.fileName
                         var file = File(sdcardDownLoad, fileName)
