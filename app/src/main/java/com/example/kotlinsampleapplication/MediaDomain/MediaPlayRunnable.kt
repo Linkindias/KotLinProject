@@ -1,6 +1,7 @@
 package com.example.kotlinsampleapplication.MediaDomain
 
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -13,13 +14,15 @@ class MediaPlayRunnable: Runnable {
     var tag: String = "MediaPlayRunnable"
     var video: VideoView? = null
     var img: ImageView? = null
+    var sound: MediaPlayer? = null
 
     var path: String = ""
     var type: String = ""
 
-    fun setVideoControl(video: VideoView, img: ImageView) {
+    fun setVideoControl(video: VideoView, img: ImageView, sound: MediaPlayer) {
         this.video = video
         this.img = img
+        this.sound = sound
     }
 
     fun setMediaPathType(path: String, type: String){
@@ -32,20 +35,27 @@ class MediaPlayRunnable: Runnable {
         img?.setVisibility(View.VISIBLE);
 
         try {
-            if (this.path.isNotEmpty() && this.type == "img") {
-                Log.i(tag, "set img")
-                var fis = FileInputStream(File(path))
-                val bmp = BitmapFactory.decodeStream(fis)
-                img?.setImageBitmap(bmp)
+            if (this.path.isNotEmpty()) {
+                Log.i(tag, "p:" + this.path)
+                if (this.type == "img") {
+                    var fis = FileInputStream(File(path))
+                    val bmp = BitmapFactory.decodeStream(fis)
+                    img?.setImageBitmap(bmp)
 
-                video?.setVisibility(View.INVISIBLE);
-            }
-            else if (this.path.isNotEmpty() && this.type == "video") {
-                Log.i(tag, "set video")
-                this.video?.setVideoPath(path)
-                this.video?.start()
+                    video?.setVisibility(View.INVISIBLE);
+                }
+                else if (this.type == "video") {
+                    this.video?.setVideoPath(path)
+                    this.video?.start()
 
-                img?.setVisibility(View.INVISIBLE);
+                    img?.setVisibility(View.INVISIBLE);
+                }
+                else if (this.type == "sound") {
+                    this.sound?.setVolume(100f, 100f)
+                    this.sound?.setDataSource(path)
+                    this.sound?.prepare();
+                    this.sound?.start()
+                }
             }
         } catch (ex: Exception) {
             Log.i(tag, ex.message.toString())

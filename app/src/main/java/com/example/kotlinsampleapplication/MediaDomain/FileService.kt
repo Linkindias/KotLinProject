@@ -3,10 +3,12 @@ package com.example.kotlinsampleapplication.MediaDomain
 import android.app.IntentService
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.os.ResultReceiver
 import android.util.Log
+import com.example.kotlinsampleapplication.Base.Companion.sdcardDownLoad
 import com.example.kotlinsampleapplication.Base.Companion.sdfJson
+import com.example.kotlinsampleapplication.Base.Companion.videoDownloadApi
+import com.example.kotlinsampleapplication.Base.Companion.videoScheduleApi
 import com.example.kotlinsampleapplication.HttpService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import com.example.kotlinsampleapplication.ViewModel.VideoInfo
@@ -31,7 +33,7 @@ class FileService : IntentService("single") {
 
         if (schedulsList.isEmpty()) {
             try {
-                var schedule = HttpService().sendGet("http://10.168.18.61/webapplication/api/video/FileSchedule")
+                var schedule = HttpService().sendGet(videoScheduleApi)
                 if (schedule != null) {
 
                     var video = Gson().fromJson(schedule.toString(), VideoInfo::class.java)
@@ -40,12 +42,17 @@ class FileService : IntentService("single") {
                 }
 
                 if (schedulsList.isNotEmpty()){
-//                    File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"*.*").delete()
+                    val files = File(sdcardDownLoad,"")
+
+                    for (file in files.listFiles())
+                        file.delete()
 
                     schedulsList.forEach {
                         var fileName = it.fileName
-                        var file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
-                        if (!file.exists()) HttpService().sendGetFile("http://10.168.18.61/webapplication/api/video/DownLoadFile?fileName=$fileName", file)
+                        var file = File(sdcardDownLoad, fileName)
+                        if (!file.exists()) {
+                            HttpService().sendGetFile(videoDownloadApi + fileName, file)
+                        }
                         it.path = file.path
                     }
                 }
@@ -54,7 +61,6 @@ class FileService : IntentService("single") {
             }
         }
 
-        Log.i(tag,"s:" + schedulsList.size.toString())
         schedulsList.forEach {
             it.sDate = sdfJson.parse(it.startDate)
             it.eDate = sdfJson.parse(it.endDate)
@@ -76,14 +82,12 @@ class FileService : IntentService("single") {
                 val bundle = Bundle()
 
                 if (currentStartSchedule != null ) {
-                    Log.i(tag, "start < now < end")
                     bundle.putString("currentPath", currentStartSchedule!!.path)
                     bundle.putString("currentType", currentStartSchedule!!.type)
                     bundle.putString("stopDate", currentStartSchedule!!.endDate)
                     bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
                     receiver!!.send(playflag, bundle)
                 } else if (nextStartSchedule != null ) {
-                    Log.i(tag, "start > now")
                     bundle.putString("currentPath", nextStartSchedule!!.path)
                     bundle.putString("currentType", nextStartSchedule!!.type)
                     bundle.putString("startDate", nextStartSchedule!!.startDate)
