@@ -36,16 +36,18 @@ class MediaActivity : AppCompatActivity()  {
         override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
 
             if (resultCode == FileService.playflag) {
-                mediaService?.setMediaPlay(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
+                mediaService?.setMediaPlay(
+                    resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
                     resultData.getString("currentPath").toString(),
                     resultData.getString("currentType").toString(),
-                    resultData.getString("stopDate").toString())
+                    resultData.getInt("index"))
             }
             else if (resultCode == FileService.stopflag) {
-                mediaService?.setMediaStop(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
+                mediaService?.setMediaStop(
+                    resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
                     resultData.getString("currentPath").toString(),
                     resultData.getString("currentType").toString(),
-                    resultData.getString("startDate").toString())
+                    resultData.getInt("index"))
             }
             runOnUiThread(mediaService?.runOnUiRunnable());
         }

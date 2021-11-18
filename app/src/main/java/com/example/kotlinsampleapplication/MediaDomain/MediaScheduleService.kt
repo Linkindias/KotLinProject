@@ -32,104 +32,95 @@ class MediaScheduleService {
         mediaStopRunnable.setVideoControl(video!!, img!!, sound!!, defaultDrawable!!)
     }
 
-    fun setMediaPlay(schedules: ArrayList<VideoDetial>, path: String, type: String, eDate: String) {
+    fun setMediaPlay(schedules: ArrayList<VideoDetial>, path: String, type: String, currentIndex: Int) {
         videoSchedules = schedules
         this.path = path
         this.type = type
         mediaPlayRunnable.setMediaPathType(path, type)
         executeRunnable = mediaPlayRunnable
 
-        findMediaStopTime(eDate)
+        findMediaStopTime(currentIndex)
     }
 
-    fun setMediaStop(schedules: ArrayList<VideoDetial>, path: String, type: String, sDate: String) {
+    fun setMediaStop(schedules: ArrayList<VideoDetial>, path: String, type: String, nextIndex: Int) {
         videoSchedules = schedules
         this.path = path
         this.type = type
         executeRunnable = mediaStopRunnable
 
-        findMediaPlayTime(sDate)
+        findMediaPlayTime(nextIndex)
     }
 
-    private fun findMediaStopTime(eDate: String) {
-        val endDuration: Long = sdfJson.parse(eDate).time!! - Date().time
+    private fun findMediaStopTime(currentIndex: Int) {
+        val endDuration: Long = videoSchedules[currentIndex].eDate!!.time - Date().time
+        Log.i(tag, "first e:" + sdf.format(videoSchedules[currentIndex].eDate) + " d:" + sdf.format(Date()) + " duration:" + endDuration)
 
-        timer = Timer()
-        timer?.schedule( object : TimerTask() {
-            override fun run() {
-                findNextScheduleToStartDate()
-            }
-        }, endDuration)
+        if (videoSchedules.size > currentIndex) {
+            timer = Timer()
+            timer?.schedule( object : TimerTask() {
+                override fun run() {
+                    findNextScheduleToStartDate(currentIndex + 1)
+                }
+            }, endDuration)
+        }
     }
 
-    private fun findMediaPlayTime(sDate: String) {
-        val startDuration: Long = sdfJson.parse(sDate).time!! - Date().time
+    private fun findMediaPlayTime(nextIndex: Int) {
+        val startDuration: Long = videoSchedules[nextIndex].sDate!!.time - Date().time
+        Log.i(tag, "first s:" + sdf.format(videoSchedules[nextIndex].sDate) + " d:" + sdf.format(Date()) + " duration:" + startDuration)
 
-        timer = Timer()
-        timer?.schedule(object : TimerTask() {
-            override fun run() {
-                findCurrentScheduleToEndDate()
-            }
-        }, startDuration)
+        if (videoSchedules.size > nextIndex) {
+            timer = Timer()
+            timer?.schedule(object : TimerTask() {
+                override fun run() {
+                    findCurrentScheduleToEndDate(nextIndex)
+                }
+            }, startDuration)
+        }
     }
 
-    private fun findNextScheduleToStartDate() {
+    private fun findNextScheduleToStartDate(nextIndex: Int) {
+        Log.i(tag, "runOnUiThread:mediaStopRunnable")
         activity?.runOnUiThread(mediaStopRunnable)
         timer?.cancel()
         timer?.purge()
         timer = null
 
-        var nextIndex:Int = -1
+        if (videoSchedules.size > nextIndex) {
+            var dtNow = Date()
+            path = videoSchedules[nextIndex].path
+            type = videoSchedules[nextIndex].type
 
-        try {
-            videoSchedules.forEachIndexed { index, it ->
-                if(it.path == path && (videoSchedules.size - 1) > index) nextIndex = index + 1
-            }
+            val startDuration: Long = sdfJson.parse(videoSchedules[nextIndex].startDate).time!! - dtNow.time
+            Log.i(tag,"second s:" + sdf.format(sdfJson.parse(videoSchedules[nextIndex].startDate)) + " d:" + sdf.format(dtNow) + " duration:" + startDuration            )
 
-            if (nextIndex > -1)
-            {
-                path = videoSchedules[nextIndex].path
-                type = videoSchedules[nextIndex].type
-                val startDuration: Long = sdfJson.parse(videoSchedules[nextIndex].startDate).time!! - Date().time
-
-                timer = Timer()
-                timer?.schedule(object : TimerTask() {
-                    override fun run() {
-                        findCurrentScheduleToEndDate()
-                    }
-                }, startDuration)
-            }
-        } catch (ex: Exception) {
-            Log.e(tag, ex.message.toString())
+            timer = Timer()
+            timer?.schedule(object : TimerTask() {
+                override fun run() {
+                    findCurrentScheduleToEndDate(nextIndex)
+                }
+            }, startDuration)
         }
     }
 
-    private fun findCurrentScheduleToEndDate() {
+    private fun findCurrentScheduleToEndDate(currentIndex: Int) {
         mediaPlayRunnable.setMediaPathType(path, type)
         activity?.runOnUiThread(mediaPlayRunnable)
         timer?.cancel()
         timer?.purge()
         timer = null
 
-        var currendSchedule: VideoDetial? = null
-        try {
-            videoSchedules.forEach {
-                if(it.path == path) currendSchedule = it
-            }
+        if (videoSchedules.size > currentIndex) {
+            var dtNow = Date()
+            val endDuration: Long = sdfJson.parse(videoSchedules[currentIndex].endDate).time!! - dtNow.time
+            Log.i(tag,"second e:" + sdf.format(sdfJson.parse(videoSchedules[currentIndex].endDate)) + " d:" + sdf.format(dtNow) + " duration:" + endDuration)
 
-            if (currendSchedule != null)
-            {
-                val endDuration: Long = sdfJson.parse(currendSchedule!!.endDate).time!! - Date().time
-
-                timer = Timer()
-                timer?.schedule(object : TimerTask() {
-                    override fun run() {
-                        findNextScheduleToStartDate()
-                    }
-                }, endDuration)
-            }
-        } catch (ex: Exception) {
-            Log.e(tag, ex.message.toString())
+            timer = Timer()
+            timer?.schedule(object : TimerTask() {
+                override fun run() {
+                    findNextScheduleToStartDate(currentIndex + 1)
+                }
+            }, endDuration)
         }
     }
 

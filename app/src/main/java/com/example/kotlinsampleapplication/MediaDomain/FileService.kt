@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.ResultReceiver
 import android.util.Log
 import com.example.kotlinsampleapplication.Base.Companion.sdcardDownLoad
+import com.example.kotlinsampleapplication.Base.Companion.sdf
 import com.example.kotlinsampleapplication.Base.Companion.sdfJson
 import com.example.kotlinsampleapplication.Base.Companion.videoDownloadApi
 import com.example.kotlinsampleapplication.Base.Companion.videoScheduleApi
@@ -67,26 +68,35 @@ class FileService : IntentService("single") {
                 var currentStartSchedule: VideoDetial? = null
                 var nextStartSchedule: VideoDetial? = null
 
-                schedulsList.forEach {
-                    if (it.sDate!! <= dtNow && dtNow <= it.eDate) currentStartSchedule = it
-
-                    if(dtNow < it.sDate && dtNow < it.eDate) nextStartSchedule = it
+                var indexflag = -1;
+                schedulsList.forEachIndexed { index, it ->
+                    if (indexflag == -1) {
+                        if (it.sDate!! <= dtNow && dtNow <= it.eDate) {
+                            currentStartSchedule = it
+                            indexflag = index
+                        } else if(dtNow <= it.sDate && dtNow <= it.eDate) {
+                            nextStartSchedule = it
+                            indexflag = index
+                        }
+                    }
                 }
 
                 receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
                 val bundle = Bundle()
 
                 if (currentStartSchedule != null ) {
+                    Log.i(tag, "end:" + sdf.format(sdfJson.parse(currentStartSchedule!!.endDate)))
+                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
                     bundle.putString("currentPath", currentStartSchedule!!.path)
                     bundle.putString("currentType", currentStartSchedule!!.type)
-                    bundle.putString("stopDate", currentStartSchedule!!.endDate)
-                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
+                    bundle.putInt("index", indexflag)
                     receiver!!.send(playflag, bundle)
                 } else if (nextStartSchedule != null ) {
+                    Log.i(tag, "start:" + sdf.format(sdfJson.parse(nextStartSchedule!!.startDate)))
+                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
                     bundle.putString("currentPath", nextStartSchedule!!.path)
                     bundle.putString("currentType", nextStartSchedule!!.type)
-                    bundle.putString("startDate", nextStartSchedule!!.startDate)
-                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>);
+                    bundle.putInt("index", indexflag)
                     receiver!!.send(stopflag, bundle)
                 }
             } catch (ex: Exception) {
