@@ -6,8 +6,10 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.VideoView
+import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import java.io.File
 import java.io.FileInputStream
+import java.util.*
 
 
 class MediaPlayRunnable: Runnable {
@@ -36,7 +38,7 @@ class MediaPlayRunnable: Runnable {
 
         try {
             if (this.path.isNotEmpty()) {
-                Log.i(tag, "p:" + this.path)
+
                 if (this.type == "img") {
                     var fis = FileInputStream(File(path))
                     val bmp = BitmapFactory.decodeStream(fis)

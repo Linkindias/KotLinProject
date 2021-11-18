@@ -53,7 +53,6 @@ class MediaScheduleService {
 
     private fun findMediaStopTime(currentIndex: Int) {
         val endDuration: Long = videoSchedules[currentIndex].eDate!!.time - Date().time
-        Log.i(tag, "first e:" + sdf.format(videoSchedules[currentIndex].eDate) + " d:" + sdf.format(Date()) + " duration:" + endDuration)
 
         if (videoSchedules.size > currentIndex) {
             timer = Timer()
@@ -67,7 +66,6 @@ class MediaScheduleService {
 
     private fun findMediaPlayTime(nextIndex: Int) {
         val startDuration: Long = videoSchedules[nextIndex].sDate!!.time - Date().time
-        Log.i(tag, "first s:" + sdf.format(videoSchedules[nextIndex].sDate) + " d:" + sdf.format(Date()) + " duration:" + startDuration)
 
         if (videoSchedules.size > nextIndex) {
             timer = Timer()
@@ -80,7 +78,6 @@ class MediaScheduleService {
     }
 
     private fun findNextScheduleToStartDate(nextIndex: Int) {
-        Log.i(tag, "runOnUiThread:mediaStopRunnable")
         activity?.runOnUiThread(mediaStopRunnable)
         timer?.cancel()
         timer?.purge()
@@ -92,7 +89,6 @@ class MediaScheduleService {
             type = videoSchedules[nextIndex].type
 
             val startDuration: Long = sdfJson.parse(videoSchedules[nextIndex].startDate).time!! - dtNow.time
-            Log.i(tag,"second s:" + sdf.format(sdfJson.parse(videoSchedules[nextIndex].startDate)) + " d:" + sdf.format(dtNow) + " duration:" + startDuration            )
 
             timer = Timer()
             timer?.schedule(object : TimerTask() {
@@ -113,7 +109,6 @@ class MediaScheduleService {
         if (videoSchedules.size > currentIndex) {
             var dtNow = Date()
             val endDuration: Long = sdfJson.parse(videoSchedules[currentIndex].endDate).time!! - dtNow.time
-            Log.i(tag,"second e:" + sdf.format(sdfJson.parse(videoSchedules[currentIndex].endDate)) + " d:" + sdf.format(dtNow) + " duration:" + endDuration)
 
             timer = Timer()
             timer?.schedule(object : TimerTask() {

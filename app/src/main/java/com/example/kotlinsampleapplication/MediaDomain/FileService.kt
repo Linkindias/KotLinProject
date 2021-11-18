@@ -29,8 +29,6 @@ class FileService : IntentService("single") {
     var schedulsList: List <VideoDetial> = listOf()
 
     override fun onHandleIntent(intent: Intent?) {
-        val uuid = UUID.randomUUID()
-        Log.i("FileService", "start:$uuid")
 
         if (schedulsList.isEmpty()) {
             try {
@@ -70,14 +68,13 @@ class FileService : IntentService("single") {
 
                 var indexflag = -1;
                 schedulsList.forEachIndexed { index, it ->
-                    if (indexflag == -1) {
-                        if (it.sDate!! <= dtNow && dtNow <= it.eDate) {
-                            currentStartSchedule = it
-                            indexflag = index
-                        } else if(dtNow <= it.sDate && dtNow <= it.eDate) {
-                            nextStartSchedule = it
-                            indexflag = index
-                        }
+                    if (IsInitial(indexflag) && IsCurrentSchedule(it, dtNow)) {
+                        currentStartSchedule = it
+                        indexflag = index
+
+                    } else if(IsInitial(indexflag) && IsNextSchedule(it, dtNow)) {
+                        nextStartSchedule = it
+                        indexflag = index
                     }
                 }
 
@@ -85,14 +82,13 @@ class FileService : IntentService("single") {
                 val bundle = Bundle()
 
                 if (currentStartSchedule != null ) {
-                    Log.i(tag, "end:" + sdf.format(sdfJson.parse(currentStartSchedule!!.endDate)))
                     bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
                     bundle.putString("currentPath", currentStartSchedule!!.path)
                     bundle.putString("currentType", currentStartSchedule!!.type)
                     bundle.putInt("index", indexflag)
                     receiver!!.send(playflag, bundle)
+
                 } else if (nextStartSchedule != null ) {
-                    Log.i(tag, "start:" + sdf.format(sdfJson.parse(nextStartSchedule!!.startDate)))
                     bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
                     bundle.putString("currentPath", nextStartSchedule!!.path)
                     bundle.putString("currentType", nextStartSchedule!!.type)
@@ -103,6 +99,18 @@ class FileService : IntentService("single") {
                 Log.e(tag, ex.message.toString())
             }
         }
+    }
+
+    private fun IsCurrentSchedule(it: VideoDetial,dtNow: Date): Boolean {
+        return it.sDate!! <= dtNow && dtNow <= it.eDate
+    }
+
+    private fun IsNextSchedule(it: VideoDetial,dtNow: Date): Boolean {
+        return dtNow <= it.sDate && dtNow <= it.eDate
+    }
+
+    private fun IsInitial(index: Int): Boolean {
+        return index == -1
     }
 
     override fun onDestroy() {
