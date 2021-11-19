@@ -20,8 +20,7 @@ import java.util.*
 
 class FileService : IntentService("single") {
     companion object {
-        const val playflag = 1
-        const val stopflag = 2
+        const val downLoadflag = 1
     }
 
     var tag: String = "FileService"
@@ -61,56 +60,11 @@ class FileService : IntentService("single") {
         }
 
         if (schedulsList.isNotEmpty()) {
-            try {
-                var dtNow = Date()
-                var currentStartSchedule: VideoDetial? = null
-                var nextStartSchedule: VideoDetial? = null
-
-                var indexflag = -1;
-                schedulsList.forEachIndexed { index, it ->
-                    if (IsInitial(indexflag) && IsCurrentSchedule(it, dtNow)) {
-                        currentStartSchedule = it
-                        indexflag = index
-
-                    } else if(IsInitial(indexflag) && IsNextSchedule(it, dtNow)) {
-                        nextStartSchedule = it
-                        indexflag = index
-                    }
-                }
-
-                receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
-                val bundle = Bundle()
-
-                if (currentStartSchedule != null ) {
-                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
-                    bundle.putString("currentPath", currentStartSchedule!!.path)
-                    bundle.putString("currentType", currentStartSchedule!!.type)
-                    bundle.putInt("index", indexflag)
-                    receiver!!.send(playflag, bundle)
-
-                } else if (nextStartSchedule != null ) {
-                    bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
-                    bundle.putString("currentPath", nextStartSchedule!!.path)
-                    bundle.putString("currentType", nextStartSchedule!!.type)
-                    bundle.putInt("index", indexflag)
-                    receiver!!.send(stopflag, bundle)
-                }
-            } catch (ex: Exception) {
-                Log.e(tag, ex.message.toString())
-            }
+            receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
+            val bundle = Bundle()
+            bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
+            receiver!!.send(downLoadflag, bundle)
         }
-    }
-
-    private fun IsCurrentSchedule(it: VideoDetial,dtNow: Date): Boolean {
-        return it.sDate!! <= dtNow && dtNow <= it.eDate
-    }
-
-    private fun IsNextSchedule(it: VideoDetial,dtNow: Date): Boolean {
-        return dtNow <= it.sDate && dtNow <= it.eDate
-    }
-
-    private fun IsInitial(index: Int): Boolean {
-        return index == -1
     }
 
     override fun onDestroy() {

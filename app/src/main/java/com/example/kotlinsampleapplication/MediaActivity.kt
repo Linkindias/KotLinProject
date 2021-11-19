@@ -23,7 +23,8 @@ import java.util.*
 
 
 class MediaActivity : AppCompatActivity()  {
-    var tag: String = "MediaActivity"
+    val tag: String = "MediaActivity"
+
     var video: VideoView? = null
     var img: ImageView? = null
     var sound: MediaPlayer? = null
@@ -35,21 +36,9 @@ class MediaActivity : AppCompatActivity()  {
 
         override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
 
-            if (resultCode == FileService.playflag) {
-                mediaService?.setMediaPlay(
-                    resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
-                    resultData.getString("currentPath").toString(),
-                    resultData.getString("currentType").toString(),
-                    resultData.getInt("index"))
+            if (resultCode == FileService.downLoadflag) {
+                mediaService?.getVideoSchedule(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>)
             }
-            else if (resultCode == FileService.stopflag) {
-                mediaService?.setMediaStop(
-                    resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>,
-                    resultData.getString("currentPath").toString(),
-                    resultData.getString("currentType").toString(),
-                    resultData.getInt("index"))
-            }
-            runOnUiThread(mediaService?.runOnUiRunnable());
         }
     }
 

@@ -14,17 +14,14 @@ import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import java.util.*
 
 class MediaScheduleService {
-    var tag: String = "MediaScheduleService"
+    val tag: String = "MediaScheduleService"
 
     var activity: MediaActivity? = null
     var mediaPlayRunnable: MediaPlayRunnable = MediaPlayRunnable()
     var mediaStopRunnable: MediaStopRunnable = MediaStopRunnable()
-    var executeRunnable: Runnable? = null
     var timer: Timer? = null
 
     var videoSchedules = ArrayList<VideoDetial>()
-    var path:String = ""
-    var type:String = ""
 
     constructor(activity: MediaActivity, video: VideoView, img: ImageView, sound: MediaPlayer, defaultDrawable: Drawable?) {
         this.activity = activity
@@ -32,97 +29,81 @@ class MediaScheduleService {
         mediaStopRunnable.setVideoControl(video!!, img!!, sound!!, defaultDrawable!!)
     }
 
-    fun setMediaPlay(schedules: ArrayList<VideoDetial>, path: String, type: String, currentIndex: Int) {
+    fun getVideoSchedule(schedules: ArrayList<VideoDetial>) {
         videoSchedules = schedules
-        this.path = path
-        this.type = type
-        mediaPlayRunnable.setMediaPathType(path, type)
-        executeRunnable = mediaPlayRunnable
 
-        findMediaStopTime(currentIndex)
+        try {
+            var dtNow = Date()
+            var currentStartSchedule: VideoDetial? = null
+            var nextStartSchedule: VideoDetial? = null
+
+            var indexflag = -1;
+            videoSchedules.forEachIndexed { index, it ->
+                if (indexflag == -1 && it.sDate!! <= dtNow && dtNow <= it.eDate) {
+                    currentStartSchedule = it
+                    indexflag = index
+
+                } else if(indexflag == -1 && dtNow <= it.sDate && dtNow <= it.eDate) {
+                    nextStartSchedule = it
+                    indexflag = index
+                }
+            }
+
+            if (currentStartSchedule != null ) {
+                mediaPlayRunnable.setMediaPathType(currentStartSchedule!!.path, currentStartSchedule!!.type)
+                activity?.runOnUiThread(mediaPlayRunnable)
+                findCurrentScheduleToEndDate(indexflag)
+
+            } else if (nextStartSchedule != null ) {
+                activity?.runOnUiThread(mediaStopRunnable)
+                findNextScheduleToStartDate(indexflag)
+            }
+        } catch (ex: Exception) {
+            Log.e(tag, ex.message.toString())
+        }
     }
 
-    fun setMediaStop(schedules: ArrayList<VideoDetial>, path: String, type: String, nextIndex: Int) {
-        videoSchedules = schedules
-        this.path = path
-        this.type = type
-        executeRunnable = mediaStopRunnable
-
-        findMediaPlayTime(nextIndex)
-    }
-
-    private fun findMediaStopTime(currentIndex: Int) {
-        val endDuration: Long = videoSchedules[currentIndex].eDate!!.time - Date().time
-
+    fun findCurrentScheduleToEndDate(currentIndex: Int) {
         if (videoSchedules.size > currentIndex) {
+            val endDuration: Long = videoSchedules[currentIndex].eDate!!.time - Date().time
+            Log.i(tag, "e:" + sdf.format(videoSchedules[currentIndex].eDate) + " d:" + sdf.format(Date()))
+
             timer = Timer()
             timer?.schedule( object : TimerTask() {
                 override fun run() {
+                    activity?.runOnUiThread(mediaStopRunnable)
+                    timer?.cancel()
+                    timer?.purge()
+                    timer = null
+
                     findNextScheduleToStartDate(currentIndex + 1)
                 }
             }, endDuration)
         }
     }
 
-    private fun findMediaPlayTime(nextIndex: Int) {
-        val startDuration: Long = videoSchedules[nextIndex].sDate!!.time - Date().time
-
+    fun findNextScheduleToStartDate(nextIndex: Int) {
         if (videoSchedules.size > nextIndex) {
+            val startDuration: Long = videoSchedules[nextIndex].sDate!!.time - Date().time
+            Log.i(tag, "s:" + sdf.format(videoSchedules[nextIndex].sDate) + " d:" + sdf.format(Date()))
+
             timer = Timer()
             timer?.schedule(object : TimerTask() {
                 override fun run() {
+                    mediaPlayRunnable.setMediaPathType(videoSchedules[nextIndex].path, videoSchedules[nextIndex].type)
+                    activity?.runOnUiThread(mediaPlayRunnable)
+                    timer?.cancel()
+                    timer?.purge()
+                    timer = null
+
                     findCurrentScheduleToEndDate(nextIndex)
                 }
             }, startDuration)
         }
-    }
-
-    private fun findNextScheduleToStartDate(nextIndex: Int) {
-        activity?.runOnUiThread(mediaStopRunnable)
-        timer?.cancel()
-        timer?.purge()
-        timer = null
-
-        if (videoSchedules.size > nextIndex) {
-            var dtNow = Date()
-            path = videoSchedules[nextIndex].path
-            type = videoSchedules[nextIndex].type
-
-            val startDuration: Long = sdfJson.parse(videoSchedules[nextIndex].startDate).time!! - dtNow.time
-
-            timer = Timer()
-            timer?.schedule(object : TimerTask() {
-                override fun run() {
-                    findCurrentScheduleToEndDate(nextIndex)
-                }
-            }, startDuration)
-        }
-    }
-
-    private fun findCurrentScheduleToEndDate(currentIndex: Int) {
-        mediaPlayRunnable.setMediaPathType(path, type)
-        activity?.runOnUiThread(mediaPlayRunnable)
-        timer?.cancel()
-        timer?.purge()
-        timer = null
-
-        if (videoSchedules.size > currentIndex) {
-            var dtNow = Date()
-            val endDuration: Long = sdfJson.parse(videoSchedules[currentIndex].endDate).time!! - dtNow.time
-
-            timer = Timer()
-            timer?.schedule(object : TimerTask() {
-                override fun run() {
-                    findNextScheduleToStartDate(currentIndex + 1)
-                }
-            }, endDuration)
-        }
-    }
-
-    fun runOnUiRunnable(): Runnable{
-        return executeRunnable!!;
     }
 
     fun onDestory() {
+        activity = null
+        timer = null
     }
 }
