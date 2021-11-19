@@ -58,6 +58,9 @@ class MediaScheduleService {
                 activity?.runOnUiThread(mediaStopRunnable)
                 findNextScheduleToStartDate(indexflag)
             }
+            else
+                activity?.runOnUiThread(mediaStopRunnable)
+
         } catch (ex: Exception) {
             Log.e(tag, ex.message.toString())
         }
@@ -80,6 +83,8 @@ class MediaScheduleService {
                 }
             }, endDuration)
         }
+        else
+            activity?.runOnUiThread(mediaStopRunnable)
     }
 
     fun findNextScheduleToStartDate(nextIndex: Int) {
@@ -100,6 +105,8 @@ class MediaScheduleService {
                 }
             }, startDuration)
         }
+        else
+            activity?.runOnUiThread(mediaStopRunnable)
     }
 
     fun onDestory() {
