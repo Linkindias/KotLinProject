@@ -15,11 +15,7 @@ abstract class VideoDBHelper: RoomDatabase() {
 
         fun getDatabase(context: Context): VideoDBHelper {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    VideoDBHelper::class.java,
-                    "word_database"
-                ).build()
+                val instance = Room.databaseBuilder(context.applicationContext, VideoDBHelper::class.java,"videoInfo" ).build()
                 INSTANCE = instance
                 instance
             }

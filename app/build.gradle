@@ -32,6 +32,8 @@ android {
     }
 }
 
+apply plugin: "kotlin-kapt"
+
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -44,6 +46,9 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
     implementation 'androidx.room:room-runtime:2.2.1'
     annotationProcessor 'androidx.room:room-compiler:2.2.1'
+
+    kapt "androidx.room:room-compiler:2.2.1"
+
     testImplementation 'androidx.room:room-testing:2.2.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

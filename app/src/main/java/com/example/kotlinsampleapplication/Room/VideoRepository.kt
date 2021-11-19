@@ -5,31 +5,31 @@ import androidx.annotation.WorkerThread
 class VideoRepository(val videoDao:VideoDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertItem(video: VideoEntity) {
+    fun insertItem(video: VideoEntity) {
         videoDao.insert(video)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertAll(videos: List<VideoEntity>) {
+    fun insertAll(videos: List<VideoEntity>) {
         videoDao.insertAll(videos)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteAll() {
+    fun deleteAll() {
         videoDao.deleteAll()
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun delete(video: VideoEntity) {
+    fun delete(video: VideoEntity) {
         videoDao.delete(video)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun update(video: VideoEntity) {
+     fun update(video: VideoEntity) {
         videoDao.update(video)
     }
 

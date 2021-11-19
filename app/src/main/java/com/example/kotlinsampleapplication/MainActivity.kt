@@ -36,6 +36,11 @@ class MainActivity : AppCompatActivity() {
             val mediaActivity = Intent(this, MediaActivity::class.java)
             startActivity(mediaActivity)
         }
+        val btRoomdb: Button = findViewById<View>(R.id.btRoomDb) as Button
+        btRoomdb.setOnClickListener {
+            val dbActivity = Intent(this, RoomActivity::class.java)
+            startActivity(dbActivity)
+        }
     }
 
     override fun onDestroy() {
