@@ -21,6 +21,7 @@ import java.util.*
 class FileService : IntentService("single") {
     companion object {
         const val downLoadflag = 1
+        var downloadErrorList: MutableList<String> = mutableListOf()
     }
 
     var tag: String = "FileService"
@@ -40,13 +41,23 @@ class FileService : IntentService("single") {
                 }
 
                 if (schedulsList.isNotEmpty()){
+                    sdcardDownLoad.listFiles().forEach {
+                        it.delete()
+                    }
+
                     schedulsList.forEach {
                         var fileName = it.fileName
-                        var file = File(sdcardDownLoad, fileName)
-                        if (!file.exists()) {
-                            HttpService().sendGetFile(videoDownloadApi + fileName, file)
+                        it.path = sdcardDownLoad.path + "/" + fileName
+                    }
+
+                    var distinctFiles = schedulsList.distinctBy { it.fileName }
+                    distinctFiles.forEach {
+                        val file = File(it.path)
+                        if(!file.exists()){
+                            var result = HttpService().sendGetFile(videoDownloadApi + it.fileName, file)
+
+                            if (result != 200) downloadErrorList.add(it.fileName)
                         }
-                        it.path = file.path
                     }
                 }
             } catch (ex: Exception) {

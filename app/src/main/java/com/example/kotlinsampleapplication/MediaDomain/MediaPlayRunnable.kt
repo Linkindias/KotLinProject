@@ -37,7 +37,7 @@ class MediaPlayRunnable: Runnable {
         img?.setVisibility(View.VISIBLE);
 
         try {
-            if (this.path.isNotEmpty()) {
+            if (this.path.isNotEmpty() && File(this.path).exists()) {
 
                 if (this.type == "img") {
                     var fis = FileInputStream(File(path))
@@ -58,6 +58,9 @@ class MediaPlayRunnable: Runnable {
                     this.sound?.prepare();
                     this.sound?.start()
                 }
+            }
+            else {
+                //show not file
             }
         } catch (ex: Exception) {
             Log.i(tag, ex.message.toString())

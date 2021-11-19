@@ -9,8 +9,11 @@ import android.widget.VideoView
 import com.example.kotlinsampleapplication.Base
 import com.example.kotlinsampleapplication.Base.Companion.sdf
 import com.example.kotlinsampleapplication.Base.Companion.sdfJson
+import com.example.kotlinsampleapplication.HttpService
 import com.example.kotlinsampleapplication.MediaActivity
+import com.example.kotlinsampleapplication.MediaDomain.FileService.Companion.downloadErrorList
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
+import java.io.File
 import java.util.*
 
 class MediaScheduleService {
@@ -107,6 +110,19 @@ class MediaScheduleService {
         }
         else
             activity?.runOnUiThread(mediaStopRunnable)
+    }
+
+    fun reDownloadFile() {
+        var downloadList = downloadErrorList.distinct().toMutableList()
+        downloadErrorList.clear()
+        downloadList.forEach {
+            val file = File( Base.sdcardDownLoad.path,it)
+            if(!file.exists()){
+                var result = HttpService().sendGetFile(Base.videoDownloadApi + it, file)
+
+                if (result != 200) downloadErrorList.add(it)
+            }
+        }
     }
 
     fun onDestory() {
