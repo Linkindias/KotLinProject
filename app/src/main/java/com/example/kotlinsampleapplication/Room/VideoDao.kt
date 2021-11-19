@@ -12,7 +12,7 @@ interface VideoDao {
     fun insert(video: VideoEntity)
 
     @Query("SELECT * FROM videoInfo WHERE path Like :path and fileName Like :fileName and type Like :type")
-    fun findByVariable(path: String, fileName: String, type: String): VideoEntity
+    fun getVideoByVariable(path: String, fileName: String, type: String): VideoEntity
 
     @Query("SELECT * FROM videoInfo")
     fun getAll(): List<VideoEntity>
