@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.kotlinsampleapplication">
+    package="com.example.kotlinsampleapplication" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -24,18 +24,18 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity
-            android:name=".RoomActivity"
-            android:exported="false" />
+        android:theme="@style/Theme.AppCompat.NoActionBar" >
+        <activity android:name=".BackgroundUpdateActivity" android:exported="false" />
 
-        <service
-            android:name=".MediaDomain.FileService"
-            android:enabled="true" />
+        <service android:name=".Service.PullService" android:enabled="true" android:exported="true" />
+
+        <activity android:name=".RoomActivity" android:exported="false" />
+
+        <service android:name=".Service.ScheduleDownLoadService" android:enabled="true" />
 
         <activity android:name=".MediaActivity" />
         <activity android:name=".TestActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,4 +1,4 @@
-package com.example.kotlinsampleapplication.MediaDomain
+package com.example.kotlinsampleapplication.Service
 
 import android.app.IntentService
 import android.content.Intent
@@ -6,10 +6,9 @@ import android.os.Bundle
 import android.os.ResultReceiver
 import android.util.Log
 import com.example.kotlinsampleapplication.Base.Companion.sdcardDownLoad
-import com.example.kotlinsampleapplication.Base.Companion.sdf
 import com.example.kotlinsampleapplication.Base.Companion.sdfJson
-import com.example.kotlinsampleapplication.Base.Companion.videoDownloadApi
-import com.example.kotlinsampleapplication.Base.Companion.videoScheduleApi
+import com.example.kotlinsampleapplication.Base.Companion.mediaDownloadApi
+import com.example.kotlinsampleapplication.Base.Companion.mediaScheduleApi
 import com.example.kotlinsampleapplication.HttpService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import com.example.kotlinsampleapplication.ViewModel.VideoInfo
@@ -18,7 +17,7 @@ import java.io.File
 import java.util.*
 
 
-class FileService : IntentService("single") {
+class ScheduleDownLoadService : IntentService("single") {
     companion object {
         const val downLoadflag = 1
         var downloadErrorList: MutableList<String> = mutableListOf()
@@ -32,7 +31,7 @@ class FileService : IntentService("single") {
 
         if (schedulsList.isEmpty()) {
             try {
-                var schedule = HttpService().sendGet(videoScheduleApi)
+                var schedule = HttpService().sendGet(mediaScheduleApi)
                 if (schedule != null) {
 
                     var video = Gson().fromJson(schedule.toString(), VideoInfo::class.java)
@@ -54,7 +53,7 @@ class FileService : IntentService("single") {
                     distinctFiles.forEach {
                         val file = File(it.path)
                         if(!file.exists()){
-                            var result = HttpService().sendGetFile(videoDownloadApi + it.fileName, file)
+                            var result = HttpService().sendGetFile(mediaDownloadApi + it.fileName, file)
 
                             if (result != 200) downloadErrorList.add(it.fileName)
                         }

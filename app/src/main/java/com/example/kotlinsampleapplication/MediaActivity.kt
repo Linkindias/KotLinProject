@@ -6,19 +6,14 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
-import android.util.Log
 import android.view.View
-import android.view.View.OnTouchListener
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.kotlinsampleapplication.Base.Companion.sdcardDownLoad
-import com.example.kotlinsampleapplication.MediaDomain.FileService
 import com.example.kotlinsampleapplication.MediaDomain.MediaScheduleService
+import com.example.kotlinsampleapplication.Service.ScheduleDownLoadService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
-import java.io.File
 import java.util.*
 
 
@@ -36,8 +31,8 @@ class MediaActivity : AppCompatActivity()  {
 
         override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
 
-            if (resultCode == FileService.downLoadflag) {
-                mediaService?.getVideoSchedule(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>)
+            if (resultCode == ScheduleDownLoadService.downLoadflag) {
+                mediaService?.getMediaSchedule(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>)
             }
         }
     }
@@ -77,7 +72,7 @@ class MediaActivity : AppCompatActivity()  {
             sound.start()
         }
 
-        serviceIntent = Intent(this, FileService::class.java) //open background service
+        serviceIntent = Intent(this, MediaScheduleService::class.java) //open background service
         serviceIntent!!.putExtra("receiver", receiver);
         startService(serviceIntent)
     }

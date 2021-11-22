@@ -9,8 +9,8 @@ class Base {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
         val domainUrl = "http://10.168.18.61"
-        val videoScheduleApi = "$domainUrl/webapplication/api/video/FileSchedule"
-        val videoDownloadApi = "$domainUrl/webapplication/api/video/DownLoadFile?fileName="
+        val mediaScheduleApi = "$domainUrl/webapplication/api/video/FileSchedule"
+        val mediaDownloadApi = "$domainUrl/webapplication/api/video/DownLoadFile?fileName="
         val sdcardDownLoad = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
     }
 }
