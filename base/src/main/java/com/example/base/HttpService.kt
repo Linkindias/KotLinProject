@@ -1,4 +1,4 @@
-package com.example.kotlinsampleapplication
+package com.example.base
 
 import android.util.Log
 import java.io.DataOutputStream

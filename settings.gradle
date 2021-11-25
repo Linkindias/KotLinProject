@@ -1,2 +1,4 @@
 rootProject.name = "KotlinSampleApplication"
 include ':app'
+include ':base'
+

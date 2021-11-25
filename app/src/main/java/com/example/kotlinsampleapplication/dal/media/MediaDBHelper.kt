@@ -1,22 +1,18 @@
-package com.example.kotlinsampleapplication.Room
+package com.example.kotlinsampleapplication.dal.media
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.kotlinsampleapplication.Base
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-import androidx.annotation.NonNull
-
 import androidx.room.migration.Migration
-
-
+import com.example.base.Common
 
 
 @Database(entities = arrayOf(MediaEntity::class), version = 2, exportSchema = false)
-@TypeConverters(Base::class)
+@TypeConverters(Common::class)
 abstract class MediaDBHelper: RoomDatabase() {
     abstract fun mediaDao(): MediaDao
 

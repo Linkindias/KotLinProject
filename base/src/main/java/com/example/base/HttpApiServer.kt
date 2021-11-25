@@ -1,4 +1,4 @@
-package com.example.kotlinsampleapplication
+package com.example.base
 
 import fi.iki.elonen.NanoHTTPD
 import java.io.FileNotFoundException

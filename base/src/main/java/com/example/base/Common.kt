@@ -1,11 +1,11 @@
-package com.example.kotlinsampleapplication
+package com.example.base
 
 import android.os.Environment
 import androidx.room.TypeConverter
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Base {
+class Common {
     companion object {
         val sdfJson = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

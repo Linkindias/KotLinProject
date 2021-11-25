@@ -5,9 +5,9 @@ import android.media.MediaPlayer
 import android.util.Log
 import android.widget.ImageView
 import android.widget.VideoView
-import com.example.kotlinsampleapplication.Base
-import com.example.kotlinsampleapplication.Base.Companion.sdf
-import com.example.kotlinsampleapplication.HttpService
+import com.example.base.Common
+import com.example.base.Common.Companion.sdf
+import com.example.base.HttpService
 import com.example.kotlinsampleapplication.MediaActivity
 import com.example.kotlinsampleapplication.Service.ScheduleDownLoadService.Companion.downloadErrorList
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
@@ -114,9 +114,9 @@ class MediaScheduleService {
         var downloadList = downloadErrorList.distinct().toMutableList()
         downloadErrorList.clear()
         downloadList.forEach {
-            val file = File( Base.sdcardDownLoad.path,it)
+            val file = File( Common.sdcardDownLoad.path,it)
             if(!file.exists()){
-                var result = HttpService().sendGetFile(Base.mediaDownloadApi + it, file)
+                var result = HttpService().sendGetFile(Common.mediaDownloadApi + it, file)
 
                 if (result != 200) downloadErrorList.add(it)
             }

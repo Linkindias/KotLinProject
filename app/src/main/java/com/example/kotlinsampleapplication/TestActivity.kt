@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.example.base.HttpService
 import com.example.kotlinsampleapplication.Model.WeatherModel
 import com.example.kotlinsampleapplication.ViewModel.WeatherInfo
 import com.google.gson.Gson

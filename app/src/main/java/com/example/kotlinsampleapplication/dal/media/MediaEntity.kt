@@ -1,9 +1,6 @@
-package com.example.kotlinsampleapplication.Room
+package com.example.kotlinsampleapplication.dal.media
 
-import android.util.Log
 import androidx.room.*
-import com.example.kotlinsampleapplication.Base
-import com.example.kotlinsampleapplication.Base.Companion.sdf
 import java.util.*
 
 @Entity(tableName = "mediaInfo")

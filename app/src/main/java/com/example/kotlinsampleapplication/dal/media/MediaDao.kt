@@ -1,4 +1,4 @@
-package com.example.kotlinsampleapplication.Room
+package com.example.kotlinsampleapplication.dal.media
 
 import androidx.room.*
 

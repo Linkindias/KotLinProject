@@ -3,14 +3,13 @@ package com.example.kotlinsampleapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import com.example.kotlinsampleapplication.Base.Companion.sdf
-import com.example.kotlinsampleapplication.Room.*
-import java.lang.Exception
-import java.util.*
+import com.example.base.Common.Companion.sdf
+import com.example.kotlinsampleapplication.dal.media.MediaDBHelper
+import com.example.kotlinsampleapplication.dal.media.MediaEntity
+import com.example.kotlinsampleapplication.dal.media.MediaRepository
 
 class RoomActivity : AppCompatActivity() {
     val tag: String = "RoomActivity"

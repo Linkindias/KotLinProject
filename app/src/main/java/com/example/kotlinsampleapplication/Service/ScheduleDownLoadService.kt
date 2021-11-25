@@ -5,11 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.util.Log
-import com.example.kotlinsampleapplication.Base.Companion.sdcardDownLoad
-import com.example.kotlinsampleapplication.Base.Companion.sdfJson
-import com.example.kotlinsampleapplication.Base.Companion.mediaDownloadApi
-import com.example.kotlinsampleapplication.Base.Companion.mediaScheduleApi
-import com.example.kotlinsampleapplication.HttpService
+import com.example.base.Common.Companion.mediaDownloadApi
+import com.example.base.Common.Companion.mediaScheduleApi
+import com.example.base.Common.Companion.sdcardDownLoad
+import com.example.base.Common.Companion.sdfJson
+import com.example.base.HttpService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import com.example.kotlinsampleapplication.ViewModel.VideoInfo
 import com.google.gson.Gson
