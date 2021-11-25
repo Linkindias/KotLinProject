@@ -5,6 +5,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import android.os.Environment
 import android.util.Log
+import com.example.base.Common
 import com.example.base.Common.Companion.jsonType
 import com.example.kotlinsampleapplication.dal.media.MediaApi
 import java.io.File
@@ -18,31 +19,18 @@ class HttpApiServer(mediaApi: MediaApi, port:Int) : NanoHTTPD(port) {
         var exception = ""
         try {
             var apiActions = session.uri.split("/")
-
             if (apiActions.size > 1) {
+
                 if (Method.GET.equals(session.getMethod())) {
 
-                    var paramaters = session.parms
+                    var result = ""
 
-                    if (apiActions[1].equals("Media") && apiActions[2] != null) {
+                    if (apiActions[1].equals("Media") && apiActions[2] != null) result = mediaApi.findActionMethod(apiActions,session.parms)
 
-                        var result: String = ""
-                        if (apiActions[2].equals("getAll")) {
-                            result = mediaApi.getMediaSchedules()
+                    if (result.equals("")) return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST, jsonType, "{ 'msg' : 'not Method' }");
 
-                        } else if (apiActions[2].equals("getType")) {
-                            result = mediaApi.getMediaSchedulesByType(paramaters["type"]!!)
+                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,Common.jsonType, result );
 
-                        } else if (apiActions[2].equals("getPath")) {
-                            result = mediaApi.getMediaSchedulesByPath(paramaters["path"]!!)
-                        } else if (apiActions[2].equals("getFileName")) {
-                            result = mediaApi.getMediaSchedulesByFileName(paramaters["fileName"]!!)
-                        }
-
-                        if (!result.equals("")) return newFixedLengthResponse(Response.Status.OK, jsonType, result);
-
-                        return newFixedLengthResponse(Response.Status.BAD_REQUEST,"jsonType","{ 'msg' : 'not Method' }");
-                    }
                 } else if (Method.POST.equals(session.getMethod())) {
 
                 } else if (Method.PUT.equals(session.getMethod())) {
