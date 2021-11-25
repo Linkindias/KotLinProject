@@ -27,9 +27,9 @@ abstract class MediaDBHelper: RoomDatabase() {
         @Volatile
         private var INSTANCE: MediaDBHelper? = null
 
-        fun getDatabase(context: Context): MediaDBHelper {
+        fun getDatabase(context: Context?): MediaDBHelper {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(context.applicationContext, MediaDBHelper::class.java,"mediaInfo" )
+                val instance = Room.databaseBuilder(context!!, MediaDBHelper::class.java,"mediaInfo" )
                                     .addMigrations(migration2)
                                     .build()
                 INSTANCE = instance

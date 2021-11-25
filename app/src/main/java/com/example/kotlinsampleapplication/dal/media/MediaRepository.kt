@@ -2,42 +2,54 @@ package com.example.kotlinsampleapplication.dal.media
 
 import androidx.annotation.WorkerThread
 
-class MediaRepository(val videoDao:MediaDao) {
+class MediaRepository(val mediaDao:MediaDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun insertItem(video: MediaEntity) {
-        videoDao.insert(video)
+    fun insertItem(media: MediaEntity) {
+        mediaDao.insert(media)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun insertAll(videos: List<MediaEntity>) {
-        videoDao.insertAll(videos)
+    fun insertAll(medias: List<MediaEntity>) {
+        mediaDao.insertAll(medias)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     fun deleteAll() {
-        videoDao.deleteAll()
+        mediaDao.deleteAll()
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun delete(video: MediaEntity) {
-        videoDao.delete(video)
+    fun delete(media: MediaEntity) {
+        mediaDao.delete(media)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-     fun update(video: MediaEntity) {
-        videoDao.update(video)
+     fun update(media: MediaEntity) {
+        mediaDao.update(media)
     }
 
     fun getAll(): List<MediaEntity>{
-        return videoDao.getAll()
+        return mediaDao.getAll()
     }
 
-    fun getVideoByVariable(path: String, fileName: String, type: String): MediaEntity{
-        return videoDao.getVideoByVariable(path, fileName, type)
+    fun getMediaByType(type: String): List<MediaEntity>{
+        return mediaDao.getMediaByVariable("%", "%", type)
+    }
+
+    fun getMediaByPath(path: String): MediaEntity? {
+        var result = mediaDao.getMediaByVariable(path, "%", "%")
+        if (result.isNotEmpty()) return result[0]
+        return null
+    }
+
+    fun getMediaByFileName(fileName: String): MediaEntity? {
+        var result = mediaDao.getMediaByVariable("%", fileName, "%")
+        if (result.isNotEmpty()) return result[0]
+        return null
     }
 }

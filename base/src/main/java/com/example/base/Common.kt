@@ -14,6 +14,7 @@ class Common {
         val mediaScheduleApi = "$domainUrl/webapplication/api/video/FileSchedule"
         val mediaDownloadApi = "$domainUrl/webapplication/api/video/DownLoadFile?fileName="
         val sdcardDownLoad = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val jsonType = "application/json"
 
         @TypeConverter
         @JvmStatic

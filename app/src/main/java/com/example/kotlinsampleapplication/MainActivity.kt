@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.base.HttpApiServer
+import com.example.kotlinsampleapplication.base.HttpApiServer
+import com.example.kotlinsampleapplication.dal.media.MediaApi
 import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
     private var httpApiServer: HttpApiServer? = null
+    private var mediaApi: MediaApi? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -47,7 +49,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            httpApiServer = HttpApiServer(8092)
+            mediaApi = MediaApi(this)
+            httpApiServer = HttpApiServer(mediaApi!!, 8092)
             httpApiServer!!.start()
         } catch (e: IOException) {
             e.printStackTrace()

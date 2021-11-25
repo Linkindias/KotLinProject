@@ -35,7 +35,7 @@ class RoomActivity : AppCompatActivity() {
                 handler.post {
                     var sb = StringBuilder()
                     videos.forEach {
-                        sb.append(it.id.toString() + " " + it.fileName + " " + it.type + " " + it.path + "\r\n")
+                        sb.append(it.id.toString() + " " + it.fileName + " " + it.type + " " + it.path + " " + it.startDate + " " + it.endDate + "\r\n")
                     }
                     et.setText("videoDB :\r\n" + sb.toString())
                 }
@@ -51,7 +51,7 @@ class RoomActivity : AppCompatActivity() {
                 handler.post {
                     var sb = StringBuilder()
                     videos.forEach {
-                        sb.append(it.id.toString() + it.fileName + " " + it.type + " " + it.path + "\r\n")
+                        sb.append(it.id.toString() + it.fileName + " " + it.type + " " + it.path + " " + it.startDate + " " + it.endDate + "\r\n")
                     }
                     et.setText("videoDB :\r\n" + sb.toString())
                 }
@@ -71,10 +71,13 @@ class RoomActivity : AppCompatActivity() {
         val query: Button = findViewById<View>(R.id.btQuery) as Button
         query.setOnClickListener {
             Thread{
-                var video = videoRepo.getAll()
-
+                var videos = videoRepo.getAll()
+                var sb = StringBuilder()
+                videos.forEach {
+                    sb.append(it.id.toString() + it.fileName + " " + it.type + " " + it.path + " " + it.startDate + " " + it.endDate + "\r\n")
+                }
                 handler.post {
-                    et.setText("videoDB size:" + video.size.toString())
+                    et.setText("videoDB :" + sb.toString())
                 }
             }.start()
         }
