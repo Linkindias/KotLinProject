@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
+    private var httpApiServer: HttpApiServer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         if (Build.VERSION.SDK_INT >= 23) {
@@ -41,9 +44,18 @@ class MainActivity : AppCompatActivity() {
             val dbActivity = Intent(this, RoomActivity::class.java)
             startActivity(dbActivity)
         }
+
+        try {
+            httpApiServer = HttpApiServer(8092)
+            httpApiServer!!.start()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+
+        if(httpApiServer != null) httpApiServer!!.stop();
     }
 }

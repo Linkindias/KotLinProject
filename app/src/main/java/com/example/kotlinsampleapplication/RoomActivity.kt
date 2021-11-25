@@ -1,21 +1,22 @@
 package com.example.kotlinsampleapplication
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import com.example.kotlinsampleapplication.Room.VideoDBHelper
-import com.example.kotlinsampleapplication.Room.VideoDao
-import com.example.kotlinsampleapplication.Room.VideoEntity
-import com.example.kotlinsampleapplication.Room.VideoRepository
+import com.example.kotlinsampleapplication.Base.Companion.sdf
+import com.example.kotlinsampleapplication.Room.*
+import java.lang.Exception
+import java.util.*
 
 class RoomActivity : AppCompatActivity() {
+    val tag: String = "RoomActivity"
 
-    val videoRepo: VideoRepository by lazy {
-        VideoRepository(VideoDBHelper.getDatabase(this)?.videoDao()!!)
+    val videoRepo: MediaRepository by lazy {
+        MediaRepository(MediaDBHelper.getDatabase(this)?.mediaDao()!!)
     }
 
     var handler:Handler = Handler()
@@ -29,7 +30,7 @@ class RoomActivity : AppCompatActivity() {
         val upDate: Button = findViewById<View>(R.id.btUpdate) as Button
         upDate.setOnClickListener {
             Thread {
-                videoRepo.update(VideoEntity("test","img", "testPath"))
+                videoRepo.update(MediaEntity("test","img", "testPath" ,sdf.parse("2021-11-25 00:00:00"), sdf.parse("2021-11-25 00:00:00")))
                 var videos = videoRepo.getAll()
 
                 handler.post {
@@ -45,7 +46,7 @@ class RoomActivity : AppCompatActivity() {
         val insert: Button = findViewById<View>(R.id.btInsert) as Button
         insert.setOnClickListener {
             Thread {
-                videoRepo.insertItem(VideoEntity("test","video", "123"))
+                videoRepo.insertItem(MediaEntity("test","video","123", sdf.parse("2021-01-01 00:00:00"),sdf.parse("2021-01-01 00:00:00") ))
                 var videos = videoRepo.getAll()
 
                 handler.post {

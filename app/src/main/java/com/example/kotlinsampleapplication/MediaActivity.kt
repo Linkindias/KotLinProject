@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.VideoView
@@ -43,38 +44,49 @@ class MediaActivity : AppCompatActivity()  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
 
-        video = findViewById<View>(R.id.videoView1) as VideoView
-        img = findViewById<View>(R.id.imageView1) as ImageView
-        sound = MediaPlayer();
+        try {
+            video = findViewById<View>(R.id.videoView1) as VideoView
+            img = findViewById<View>(R.id.imageView1) as ImageView
+            sound = MediaPlayer();
 
-        mediaService = MediaScheduleService(this,video!!, img!!, sound!!, ContextCompat.getDrawable(this,R.drawable.netcore))
+            mediaService = MediaScheduleService(
+                this,
+                video!!,
+                img!!,
+                sound!!,
+                ContextCompat.getDrawable(this, R.drawable.netcore)
+            )
 
-        video?.setOnPreparedListener{ video -> //cycle play
-            video.isLooping = true
-            video.start()
+            video?.setOnPreparedListener { video -> //cycle play
+                video.isLooping = true
+                video.start()
+            }
+
+            video?.setOnTouchListener { v, event ->  //not touch
+                true
+            }
+
+            video?.setOnCompletionListener { video -> //played restart
+                video.start()
+            }
+
+            sound?.setOnPreparedListener { sound ->
+                sound.isLooping = true;
+                sound.setVolume(100f, 100f) //muted
+                sound.start()
+            }
+
+            sound?.setOnCompletionListener { sound ->
+                sound.start()
+            }
+
+            serviceIntent = Intent(this, ScheduleDownLoadService::class.java) //open background service
+            serviceIntent!!.putExtra("receiver", receiver);
+            startService(serviceIntent)
+
+        } catch (e: Exception) {
+            Log.i(tag, e.message.toString())
         }
-
-        video?.setOnTouchListener{ v, event ->  //not touch
-            true
-        }
-
-        video?.setOnCompletionListener { video -> //played restart
-            video.start()
-        }
-
-        sound?.setOnPreparedListener{ sound ->
-            sound.isLooping = true;
-            sound.setVolume(100f, 100f) //muted
-            sound.start()
-        }
-
-        sound?.setOnCompletionListener { sound ->
-            sound.start()
-        }
-
-        serviceIntent = Intent(this, MediaScheduleService::class.java) //open background service
-        serviceIntent!!.putExtra("receiver", receiver);
-        startService(serviceIntent)
     }
 
     override fun onDestroy() {

@@ -2,16 +2,16 @@ package com.example.kotlinsampleapplication.Room
 
 import androidx.annotation.WorkerThread
 
-class VideoRepository(val videoDao:VideoDao) {
+class MediaRepository(val videoDao:MediaDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun insertItem(video: VideoEntity) {
+    fun insertItem(video: MediaEntity) {
         videoDao.insert(video)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun insertAll(videos: List<VideoEntity>) {
+    fun insertAll(videos: List<MediaEntity>) {
         videoDao.insertAll(videos)
     }
 
@@ -23,21 +23,21 @@ class VideoRepository(val videoDao:VideoDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun delete(video: VideoEntity) {
+    fun delete(video: MediaEntity) {
         videoDao.delete(video)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-     fun update(video: VideoEntity) {
+     fun update(video: MediaEntity) {
         videoDao.update(video)
     }
 
-    fun getAll(): List<VideoEntity>{
+    fun getAll(): List<MediaEntity>{
         return videoDao.getAll()
     }
 
-    fun getVideoByVariable(path: String, fileName: String, type: String): VideoEntity{
+    fun getVideoByVariable(path: String, fileName: String, type: String): MediaEntity{
         return videoDao.getVideoByVariable(path, fileName, type)
     }
 }

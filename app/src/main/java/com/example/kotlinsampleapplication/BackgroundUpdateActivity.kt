@@ -1,11 +1,14 @@
 package com.example.kotlinsampleapplication
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import com.example.kotlinsampleapplication.Service.PullService
+import com.example.kotlinsampleapplication.Service.PullService.LocalBinder
+import android.content.Intent
 
 class BackgroundUpdateActivity : AppCompatActivity() {
 
@@ -17,7 +20,7 @@ class BackgroundUpdateActivity : AppCompatActivity() {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as PullService.LocalBinder
+            val binder = service as LocalBinder
             mService = binder.getService()
             mBound = true
         }
@@ -30,5 +33,8 @@ class BackgroundUpdateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_background_update)
+
+        val serviceIntent = Intent(this, PullService::class.java)
+        this.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 }

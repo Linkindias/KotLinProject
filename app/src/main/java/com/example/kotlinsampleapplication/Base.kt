@@ -1,7 +1,9 @@
 package com.example.kotlinsampleapplication
 
 import android.os.Environment
+import androidx.room.TypeConverter
 import java.text.SimpleDateFormat
+import java.util.*
 
 class Base {
     companion object {
@@ -12,5 +14,17 @@ class Base {
         val mediaScheduleApi = "$domainUrl/webapplication/api/video/FileSchedule"
         val mediaDownloadApi = "$domainUrl/webapplication/api/video/DownLoadFile?fileName="
         val sdcardDownLoad = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+
+        @TypeConverter
+        @JvmStatic
+        fun stringToDate(value: String): Date {
+            return sdf.parse(value)
+        }
+
+        @TypeConverter
+        @JvmStatic
+        fun dateToString(value: Date): String {
+            return sdf.format(value)
+        }
     }
 }
