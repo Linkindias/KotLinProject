@@ -3,10 +3,10 @@ package com.example.kotlinsampleapplication.dal.media
 import android.content.Context
 import android.util.Log
 import com.example.base.Common.Companion.sdf
+import com.example.kotlinsampleapplication.Model.MediaCModel
 import com.example.kotlinsampleapplication.Model.MediaCUModel
 import com.example.kotlinsampleapplication.Model.MediaDModel
 import com.google.gson.Gson
-import java.lang.Exception
 import java.util.*
 
 
@@ -37,6 +37,10 @@ class MediaApi {
             url[2].equals("getFileName") -> {
                 return getMediaSchedulesByFileName(para["fileName"]!!)
             }
+            url[2].equals("insertMedia") -> {
+                var medias = Gson().fromJson(para.get("postData").toString(), MediaCModel::class.java)
+                return insertMediaSchedules(medias.info)
+            }
             url[2].equals("updateMedia") -> {
                 var media = Gson().fromJson(para.get("postData").toString(), MediaCUModel::class.java)
                 return updateMediaScheduleByPara(media.path,media.type,media.fileName,sdf.parse(media.startDate), sdf.parse(media.endDate))
@@ -63,6 +67,14 @@ class MediaApi {
 
     private fun getMediaSchedulesByFileName(fileName:String): String {
         return Gson().toJson(videoRepo.getMediaByFileName(fileName))
+    }
+
+    private fun insertMediaSchedules(medias: Array<MediaCUModel>): String {
+        var mediaEntitys:MutableList<MediaEntity> = mutableListOf()
+        medias.forEach {
+            mediaEntitys.add(MediaEntity(it.fileName,it.type, it.path, sdf.parse(it.startDate),sdf.parse(it.endDate)))
+        }
+        return Gson().toJson(videoRepo.insertMediaSchedule(mediaEntitys))
     }
 
     private fun updateMediaScheduleByPara(path: String, type: String, fileName: String, startDate: Date, endDate: Date): String {

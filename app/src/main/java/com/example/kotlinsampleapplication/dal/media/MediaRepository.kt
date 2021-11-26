@@ -15,20 +15,8 @@ class MediaRepository(val mediaDao:MediaDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun insertAll(medias: List<MediaEntity>) {
-        mediaDao.insertAll(medias)
-    }
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
     fun deleteAll() {
         mediaDao.deleteAll()
-    }
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    fun delete(media: MediaEntity) {
-        mediaDao.delete(media)
     }
 
     fun getAll(): List<MediaEntity>{
@@ -84,6 +72,23 @@ class MediaRepository(val mediaDao:MediaDao) {
     fun update(media: MediaEntity): String {
         var result = mediaDao.update(media)
         return ""
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    fun insertMediaSchedule(medias: List<MediaEntity>): String {
+        var fileNames : MutableList<String> = mutableListOf()
+
+        medias.forEach {
+            var media = mediaDao.getMediaByVariable("%", it.fileName, "%")
+            if (media.isEmpty())
+                mediaDao.insert(it)
+            else
+                fileNames.add(it.fileName)
+        }
+
+        if (fileNames.size > 0) return "error${fileNames.joinToString(separator = ",")}"
+        return "success"
     }
 
     private fun checkUpdateDB(changeMedia: MediaEntity): String {
