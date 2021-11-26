@@ -27,25 +27,17 @@ class HttpApiServer(mediaApi: MediaApi, port:Int) : NanoHTTPD(port) {
 
                     if (apiActions[1].equals("Media") && apiActions[2] != null) result = mediaApi.findActionMethod(apiActions,session.parms)
 
-                    if (result.equals("")) return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST, jsonType, "{ 'msg' : 'not Method' }");
-
-                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,Common.jsonType, result );
-
                 } else if (Method.POST.equals(session.getMethod())) {
 
                     val files: Map<String, String> = HashMap()
                     session.parseBody(files)
 
                     if (apiActions[1].equals("Media") && apiActions[2] != null) result = mediaApi.findActionMethod(apiActions, files)
-
-                    Log.i(tag, "r:" + result)
-                    if (result.equals("")) return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST, jsonType, "{ 'msg' : 'not Method' }");
-
-                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,Common.jsonType, result );
-
-                } else if (Method.DELETE.equals(session.getMethod())) {
-
                 }
+
+                if (result.equals("")) return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST, jsonType, "{ 'msg' : 'not Method' }");
+
+                return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,Common.jsonType, result );
             }
         }
         catch (e: Exception){

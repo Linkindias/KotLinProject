@@ -2,12 +2,11 @@ package com.example.kotlinsampleapplication.dal.media
 
 import android.content.Context
 import android.util.Log
-import com.example.base.Common
 import com.example.base.Common.Companion.sdf
-import com.example.kotlinsampleapplication.Model.MediaModel
-import com.example.kotlinsampleapplication.Model.WeatherModel
+import com.example.kotlinsampleapplication.Model.MediaCUModel
+import com.example.kotlinsampleapplication.Model.MediaDModel
 import com.google.gson.Gson
-import fi.iki.elonen.NanoHTTPD
+import java.lang.Exception
 import java.util.*
 
 
@@ -39,8 +38,12 @@ class MediaApi {
                 return getMediaSchedulesByFileName(para["fileName"]!!)
             }
             url[2].equals("updateMedia") -> {
-                var media = Gson().fromJson(para.get("postData").toString(), MediaModel::class.java)
+                var media = Gson().fromJson(para.get("postData").toString(), MediaCUModel::class.java)
                 return updateMediaScheduleByPara(media.path,media.type,media.fileName,sdf.parse(media.startDate), sdf.parse(media.endDate))
+            }
+            url[2].equals("deleteMedia") -> {
+                var media = Gson().fromJson(para.get("postData").toString(), MediaDModel::class.java)
+                return deleteMediaScheduleByFileName(media.fileName)
             }
             else -> return ""
         }
@@ -64,5 +67,9 @@ class MediaApi {
 
     private fun updateMediaScheduleByPara(path: String, type: String, fileName: String, startDate: Date, endDate: Date): String {
         return Gson().toJson(videoRepo.updateMediaSchedule(path, type, fileName, startDate, endDate))
+    }
+
+    private fun deleteMediaScheduleByFileName(fileName: String): String {
+        return Gson().toJson(videoRepo.deleteMediaSchedule(fileName))
     }
 }

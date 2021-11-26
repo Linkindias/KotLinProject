@@ -62,7 +62,19 @@ class MediaRepository(val mediaDao:MediaDao) {
             medias[0].endDate = endDate
             mediaDao.update(medias[0])
 
-            return checkDBChange(MediaEntity(fileName,type,path,startDate,endDate))
+            return checkUpdateDB(MediaEntity(fileName,type,path,startDate,endDate))
+        }
+        return "find not media :${fileName}"
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    fun deleteMediaSchedule(fileName: String): String {
+        var medias = mediaDao.getMediaByVariable("%", fileName, "%")
+        if (medias.isNotEmpty()) {
+            mediaDao.delete(medias[0])
+            Log.i(tag, "dao delete")
+            return checkDeleteDB(fileName)
         }
         return "find not media :${fileName}"
     }
@@ -74,12 +86,19 @@ class MediaRepository(val mediaDao:MediaDao) {
         return ""
     }
 
-    fun checkDBChange(changeMedia: MediaEntity): String {
+    private fun checkUpdateDB(changeMedia: MediaEntity): String {
         var mediasUpdate = mediaDao.getMediaByVariable("%", changeMedia.fileName, "%")
         if (mediasUpdate.isNotEmpty() && mediasUpdate[0].path == changeMedia.path && mediasUpdate[0].type == changeMedia.type &&
             mediasUpdate[0].startDate == changeMedia.startDate && mediasUpdate[0].endDate == changeMedia.endDate)
             return "success"
 
+        return "error"
+    }
+
+    private fun checkDeleteDB(fileName: String): String {
+        var mediasUpdate = mediaDao.getMediaByVariable("%", fileName, "%")
+
+        if (mediasUpdate.isEmpty()) return "success"
         return "error"
     }
 }
