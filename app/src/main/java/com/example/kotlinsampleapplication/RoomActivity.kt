@@ -74,7 +74,7 @@ class RoomActivity : AppCompatActivity() {
                 var videos = videoRepo.getAll()
                 var sb = StringBuilder()
                 videos.forEach {
-                    sb.append(it.id.toString() + it.fileName + " " + it.type + " " + it.path + " " + it.startDate + " " + it.endDate + "\r\n")
+                    sb.append(it.id.toString() + it.fileName + " " + it.type + " " + it.path + " " + sdf.format(it.startDate) + " " + sdf.format(it.endDate) + "\r\n")
                 }
                 handler.post {
                     et.setText("videoDB :" + sb.toString())

@@ -59,8 +59,7 @@ class TestActivity : AppCompatActivity() {
                     var result = hs?.sendGet("http://10.168.18.61/webapplication/api/weather?locationName=新北市")
                     if (result != null) {
                         hd?.post {
-                            var gson = Gson()
-                            var weather = gson.fromJson(result.toString(), WeatherModel::class.java)
+                            var weather = Gson().fromJson(result.toString(), WeatherModel::class.java)
                             if (weather != null && weather.success){
                                 var newline = "\r\n"
                                 var mutableList: MutableList<WeatherInfo>  = mutableListOf()

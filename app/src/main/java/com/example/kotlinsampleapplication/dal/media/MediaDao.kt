@@ -1,6 +1,7 @@
 package com.example.kotlinsampleapplication.dal.media
 
 import androidx.room.*
+import java.util.*
 
 @Dao
 interface MediaDao {
@@ -22,6 +23,9 @@ interface MediaDao {
 
     @Delete
     fun delete(video: MediaEntity)
+
+//    @Update("UPDATE mediaInfo SET path =:path, type =:type WHERE fileName =:fileName and startDate =:startDate and endDate =:endDate")
+//    fun update(path: String, fileName: String, type: String, startDate: Date, endDate: Date)
 
     @Update
     fun update(video: MediaEntity)

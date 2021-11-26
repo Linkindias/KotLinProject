@@ -1,8 +1,12 @@
 package com.example.kotlinsampleapplication.dal.media
 
+import android.util.Log
 import androidx.annotation.WorkerThread
+import java.util.*
 
 class MediaRepository(val mediaDao:MediaDao) {
+    val tag: String = "MediaRepository"
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     fun insertItem(media: MediaEntity) {
@@ -27,12 +31,6 @@ class MediaRepository(val mediaDao:MediaDao) {
         mediaDao.delete(media)
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-     fun update(media: MediaEntity) {
-        mediaDao.update(media)
-    }
-
     fun getAll(): List<MediaEntity>{
         return mediaDao.getAll()
     }
@@ -51,5 +49,37 @@ class MediaRepository(val mediaDao:MediaDao) {
         var result = mediaDao.getMediaByVariable("%", fileName, "%")
         if (result.isNotEmpty()) return result[0]
         return null
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    fun updateMediaSchedule(path: String, type: String, fileName: String, startDate: Date, endDate: Date): String {
+        var medias = mediaDao.getMediaByVariable("%", fileName, "%")
+        if (medias.isNotEmpty()) {
+            medias[0].path = path
+            medias[0].type = type
+            medias[0].startDate = startDate
+            medias[0].endDate = endDate
+            mediaDao.update(medias[0])
+
+            return checkDBChange(MediaEntity(fileName,type,path,startDate,endDate))
+        }
+        return "find not media :${fileName}"
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    fun update(media: MediaEntity): String {
+        var result = mediaDao.update(media)
+        return ""
+    }
+
+    fun checkDBChange(changeMedia: MediaEntity): String {
+        var mediasUpdate = mediaDao.getMediaByVariable("%", changeMedia.fileName, "%")
+        if (mediasUpdate.isNotEmpty() && mediasUpdate[0].path == changeMedia.path && mediasUpdate[0].type == changeMedia.type &&
+            mediasUpdate[0].startDate == changeMedia.startDate && mediasUpdate[0].endDate == changeMedia.endDate)
+            return "success"
+
+        return "error"
     }
 }

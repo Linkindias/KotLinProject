@@ -1,9 +1,14 @@
 package com.example.kotlinsampleapplication.dal.media
 
 import android.content.Context
+import android.util.Log
 import com.example.base.Common
+import com.example.base.Common.Companion.sdf
+import com.example.kotlinsampleapplication.Model.MediaModel
+import com.example.kotlinsampleapplication.Model.WeatherModel
 import com.google.gson.Gson
 import fi.iki.elonen.NanoHTTPD
+import java.util.*
 
 
 class MediaApi {
@@ -23,18 +28,19 @@ class MediaApi {
         when {
             url[2].equals("getAll") -> {
                 return getMediaSchedules()
-
             }
             url[2].equals("getType") -> {
                 return getMediaSchedulesByType(para["type"]!!)
-
             }
             url[2].equals("getPath") -> {
                 return getMediaSchedulesByPath(para["path"]!!)
-
             }
             url[2].equals("getFileName") -> {
                 return getMediaSchedulesByFileName(para["fileName"]!!)
+            }
+            url[2].equals("updateMedia") -> {
+                var media = Gson().fromJson(para.get("postData").toString(), MediaModel::class.java)
+                return updateMediaScheduleByPara(media.path,media.type,media.fileName,sdf.parse(media.startDate), sdf.parse(media.endDate))
             }
             else -> return ""
         }
@@ -54,5 +60,9 @@ class MediaApi {
 
     private fun getMediaSchedulesByFileName(fileName:String): String {
         return Gson().toJson(videoRepo.getMediaByFileName(fileName))
+    }
+
+    private fun updateMediaScheduleByPara(path: String, type: String, fileName: String, startDate: Date, endDate: Date): String {
+        return Gson().toJson(videoRepo.updateMediaSchedule(path, type, fileName, startDate, endDate))
     }
 }
