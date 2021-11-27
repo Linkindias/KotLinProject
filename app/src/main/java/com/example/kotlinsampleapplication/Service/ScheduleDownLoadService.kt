@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.util.Log
+import com.example.base.Common
 import com.example.base.Common.Companion.mediaDownloadApi
 import com.example.base.Common.Companion.mediaScheduleApi
 import com.example.base.Common.Companion.sdcardDownLoad
@@ -29,51 +30,87 @@ class ScheduleDownLoadService : IntentService("single") {
 
     override fun onHandleIntent(intent: Intent?) {
 
-        if (schedulsList.isEmpty()) {
-            try {
-                var schedule = HttpService().sendGet(mediaScheduleApi)
-                if (schedule != null) {
+        try {
+            getServerSchedules()
 
-                    var video = Gson().fromJson(schedule.toString(), VideoInfo::class.java)
-                    if(video != null && video.videos?.size!! > 0)
-                        schedulsList = video.videos!!.toList()
-                }
+            if (schedulsList.isNotEmpty()){
+                deleteLocalFiles()
 
-                if (schedulsList.isNotEmpty()){
-                    sdcardDownLoad.listFiles().forEach {
-                        it.delete()
-                    }
+                setFileNamePathProperty()
 
-                    schedulsList.forEach {
-                        var fileName = it.fileName
-                        it.path = sdcardDownLoad.path + "/" + fileName
-                    }
-
-                    var distinctFiles = schedulsList.distinctBy { it.fileName }
-                    distinctFiles.forEach {
-                        val file = File(it.path)
-                        if(!file.exists()){
-                            var result = HttpService().sendGetFile(mediaDownloadApi + it.fileName, file)
-
-                            if (result != 200) downloadErrorList.add(it.fileName)
-                        }
-                    }
-                }
-            } catch (ex: Exception) {
-                Log.e(tag, ex.message.toString())
+                getServerFiles()
             }
+        } catch (ex: Exception) {
+            Log.e(tag, ex.message.toString())
+            return
         }
 
+        transefarStringToDateOfSchedule()
+
+        if (schedulsList.isNotEmpty()) {
+            sendNotifyScheduleComplate(intent)
+        }
+    }
+
+    private fun sendNotifyScheduleComplate(intent: Intent?) {
+        receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
+        val bundle = Bundle()
+        bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
+        receiver!!.send(downLoadflag, bundle)
+    }
+
+    private fun transefarStringToDateOfSchedule() {
         schedulsList.forEach {
             it.sDate = sdfJson.parse(it.startDate)
             it.eDate = sdfJson.parse(it.endDate)
         }
+    }
 
-        if (schedulsList.isNotEmpty()) {
-            receiver = intent?.getParcelableExtra("receiver") as ResultReceiver?
-            val bundle = Bundle()
-            bundle.putParcelableArrayList("schedules", schedulsList as ArrayList<VideoDetial>)
-            receiver!!.send(downLoadflag, bundle)
+    private fun getServerFiles() {
+        var distinctFiles = schedulsList.distinctBy { it.fileName }
+        distinctFiles.forEach {
+            val file = File(it.path)
+            if (!file.exists()) {
+                var result = HttpService().sendGetFile(mediaDownloadApi + it.fileName, file)
+
+                if (result != 200) downloadErrorList.add(it.fileName)
+            }
+        }
+    }
+
+    private fun setFileNamePathProperty() {
+        schedulsList.forEach {
+            var fileName = it.fileName
+            it.path = sdcardDownLoad.path + "/" + fileName
+        }
+    }
+
+    private fun deleteLocalFiles() {
+        sdcardDownLoad.listFiles().forEach {
+            it.delete()
+        }
+    }
+
+    private fun getServerSchedules() {
+        var schedule = HttpService().sendGet(mediaScheduleApi)
+        if (schedule != null) {
+
+            var video = Gson().fromJson(schedule.toString(), VideoInfo::class.java)
+            if (video != null && video.videos?.size!! > 0)
+                schedulsList = video.videos!!.toList()
+        }
+    }
+
+    public fun reDownloadFile() {
+        var downloadList = downloadErrorList.distinct().toMutableList()
+        downloadErrorList.clear()
+        downloadList.forEach {
+            val file = File( Common.sdcardDownLoad.path,it)
+            if(!file.exists()){
+                var result = HttpService().sendGetFile(Common.mediaDownloadApi + it, file)
+
+                if (result != 200) downloadErrorList.add(it)
+            }
         }
     }
 

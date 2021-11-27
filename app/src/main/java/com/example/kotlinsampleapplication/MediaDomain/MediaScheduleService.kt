@@ -26,7 +26,7 @@ class MediaScheduleService {
 
     constructor(activity: MediaActivity, video: VideoView, img: ImageView, sound: MediaPlayer, defaultDrawable: Drawable?) {
         this.activity = activity
-        mediaPlayRunnable.setVideoControl(video!!, img!!, sound!!)
+        mediaPlayRunnable.setVideoControl(video!!, img!!, sound!!) //ioc
         mediaStopRunnable.setVideoControl(video!!, img!!, sound!!, defaultDrawable!!)
     }
 
@@ -40,11 +40,11 @@ class MediaScheduleService {
 
             var indexflag = -1;
             mediaSchedules.forEachIndexed { index, it ->
-                if (indexflag == -1 && it.sDate!! <= dtNow && dtNow <= it.eDate) {
+                if (IsCurrentSchedule(indexflag, it, dtNow)) {
                     currentStartSchedule = it
                     indexflag = index
 
-                } else if(indexflag == -1 && dtNow <= it.sDate && dtNow <= it.eDate) {
+                } else if(IsNextSchedule(indexflag, dtNow, it)) {
                     nextStartSchedule = it
                     indexflag = index
                 }
@@ -66,6 +66,12 @@ class MediaScheduleService {
             Log.e(tag, ex.message.toString())
         }
     }
+
+    private fun IsNextSchedule(indexflag: Int, dtNow: Date, it: VideoDetial)
+                = indexflag == -1 && dtNow <= it.sDate && dtNow <= it.eDate
+
+    private fun IsCurrentSchedule(indexflag: Int, it: VideoDetial, dtNow: Date)
+                = indexflag == -1 && it.sDate!! <= dtNow && dtNow <= it.eDate
 
     fun findCurrentScheduleToEndDate(currentIndex: Int) {
         if (mediaSchedules.size > currentIndex) {
@@ -108,19 +114,6 @@ class MediaScheduleService {
         }
         else
             activity?.runOnUiThread(mediaStopRunnable)
-    }
-
-    fun reDownloadFile() {
-        var downloadList = downloadErrorList.distinct().toMutableList()
-        downloadErrorList.clear()
-        downloadList.forEach {
-            val file = File( Common.sdcardDownLoad.path,it)
-            if(!file.exists()){
-                var result = HttpService().sendGetFile(Common.mediaDownloadApi + it, file)
-
-                if (result != 200) downloadErrorList.add(it)
-            }
-        }
     }
 
     fun onDestory() {
