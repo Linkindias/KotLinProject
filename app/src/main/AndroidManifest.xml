@@ -25,19 +25,31 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        tools:replace="android:icon,android:theme"
-        android:theme="@style/Theme.AppCompat.NoActionBar" >
-        <activity android:name=".BackgroundUpdateActivity" android:exported="false" />
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        tools:replace="android:icon,android:theme">
+        <activity
+            android:name=".SerialActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BackgroundUpdateActivity"
+            android:exported="false" />
 
-        <service android:name=".Service.PullService" android:enabled="true" android:exported="true" />
+        <service
+            android:name=".Service.PullService"
+            android:enabled="true"
+            android:exported="true" />
 
-        <activity android:name=".RoomActivity" android:exported="false" />
+        <activity
+            android:name=".RoomActivity"
+            android:exported="false" />
 
-        <service android:name=".Service.ScheduleDownLoadService" android:enabled="true" />
+        <service
+            android:name=".Service.ScheduleDownLoadService"
+            android:enabled="true" />
 
         <activity android:name=".MediaActivity" />
         <activity android:name=".TestActivity" />
-        <activity android:name=".MainActivity" >
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

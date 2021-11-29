@@ -47,6 +47,11 @@ class MainActivity : AppCompatActivity() {
             val dbActivity = Intent(this, RoomActivity::class.java)
             startActivity(dbActivity)
         }
+        val btSerial: Button = findViewById<View>(R.id.btSerial) as Button
+        btRoomdb.setOnClickListener {
+            val serialActivity = Intent(this, SerialActivity::class.java)
+            startActivity(serialActivity)
+        }
 
         try {
             mediaApi = MediaApi(this)
