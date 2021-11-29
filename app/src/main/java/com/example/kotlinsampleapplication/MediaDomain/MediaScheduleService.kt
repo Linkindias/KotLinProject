@@ -18,16 +18,12 @@ class MediaScheduleService {
     val tag: String = "MediaScheduleService"
 
     var activity: MediaActivity? = null
-    var mediaPlayRunnable: MediaPlayRunnable = MediaPlayRunnable()
-    var mediaStopRunnable: MediaStopRunnable = MediaStopRunnable()
     var timer: Timer? = null
 
     var mediaSchedules = ArrayList<VideoDetial>()
 
-    constructor(activity: MediaActivity, video: VideoView, img: ImageView, sound: MediaPlayer, defaultDrawable: Drawable?) {
+    constructor(activity: MediaActivity) {
         this.activity = activity
-        mediaPlayRunnable.setVideoControl(video!!, img!!, sound!!) //ioc
-        mediaStopRunnable.setVideoControl(video!!, img!!, sound!!, defaultDrawable!!)
     }
 
     fun getMediaSchedule(schedules: ArrayList<VideoDetial>) {
@@ -51,16 +47,16 @@ class MediaScheduleService {
             }
 
             if (currentStartSchedule != null ) {
-                mediaPlayRunnable.setMediaPathType(currentStartSchedule!!.path, currentStartSchedule!!.type)
-                activity?.runOnUiThread(mediaPlayRunnable)
+                activity?.setMediaPathType(currentStartSchedule!!.path, currentStartSchedule!!.type)
+                activity?.executeMediaPlay()
                 findCurrentScheduleToEndDate(indexflag)
 
             } else if (nextStartSchedule != null ) {
-                activity?.runOnUiThread(mediaStopRunnable)
+                activity?.executeMediaStop()
                 findNextScheduleToStartDate(indexflag)
             }
             else
-                activity?.runOnUiThread(mediaStopRunnable)
+                activity?.executeMediaStop()
 
         } catch (ex: Exception) {
             Log.e(tag, ex.message.toString())
@@ -81,7 +77,7 @@ class MediaScheduleService {
             timer = Timer()
             timer?.schedule( object : TimerTask() {
                 override fun run() {
-                    activity?.runOnUiThread(mediaStopRunnable)
+                    activity?.executeMediaStop()
                     timer?.cancel()
                     timer?.purge()
                     timer = null
@@ -91,7 +87,7 @@ class MediaScheduleService {
             }, endDuration)
         }
         else
-            activity?.runOnUiThread(mediaStopRunnable)
+            activity?.executeMediaStop()
     }
 
     fun findNextScheduleToStartDate(nextIndex: Int) {
@@ -102,8 +98,8 @@ class MediaScheduleService {
             timer = Timer()
             timer?.schedule(object : TimerTask() {
                 override fun run() {
-                    mediaPlayRunnable.setMediaPathType(mediaSchedules[nextIndex].path, mediaSchedules[nextIndex].type)
-                    activity?.runOnUiThread(mediaPlayRunnable)
+                    activity?.setMediaPathType(mediaSchedules[nextIndex].path, mediaSchedules[nextIndex].type)
+                    activity?.executeMediaPlay()
                     timer?.cancel()
                     timer?.purge()
                     timer = null
@@ -113,7 +109,7 @@ class MediaScheduleService {
             }, startDuration)
         }
         else
-            activity?.runOnUiThread(mediaStopRunnable)
+            activity?.executeMediaStop()
     }
 
     fun onDestory() {

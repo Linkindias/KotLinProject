@@ -2,6 +2,8 @@ package com.example.kotlinsampleapplication
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +17,8 @@ import androidx.core.content.ContextCompat
 import com.example.kotlinsampleapplication.MediaDomain.MediaScheduleService
 import com.example.kotlinsampleapplication.Service.ScheduleDownLoadService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
+import java.io.File
+import java.io.FileInputStream
 import java.util.*
 
 
@@ -28,28 +32,23 @@ class MediaActivity : AppCompatActivity()  {
     var serviceIntent: Intent? = null
     var mediaService: MediaScheduleService? = null
 
-    val receiver: ResultReceiver = object : ResultReceiver(Handler()) {
-
-        override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
-
-            if (resultCode == ScheduleDownLoadService.downLoadflag) {
-                mediaService?.getMediaSchedule(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>)
-            }
-        }
-    }
+    var path: String = ""
+    var type: String = ""
+    var defaultDrawable: Drawable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE; //轉橫向
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
+        defaultDrawable = ContextCompat.getDrawable(this, R.drawable.netcore)
 
         try {
             video = findViewById<View>(R.id.videoView1) as VideoView
             img = findViewById<View>(R.id.imageView1) as ImageView
             sound = MediaPlayer();
 
-            mediaService = MediaScheduleService(this, video!!, img!!, sound!!, ContextCompat.getDrawable(this, R.drawable.netcore)            )
+            mediaService = MediaScheduleService(this)
 
             video?.setOnPreparedListener { video -> //cycle play
                 video.isLooping = true
@@ -81,6 +80,83 @@ class MediaActivity : AppCompatActivity()  {
         } catch (e: Exception) {
             Log.i(tag, e.message.toString())
         }
+    }
+
+    var mediaPlayRunnable: Runnable = object: Runnable {
+        override fun run() {
+            video?.setVisibility(View.VISIBLE);
+            img?.setVisibility(View.VISIBLE);
+
+            try {
+                if (path.isNotEmpty() && File(path).exists()) {
+
+                    if (type == "img") {
+                        var fis = FileInputStream(File(path))
+                        val bmp = BitmapFactory.decodeStream(fis)
+                        img?.setImageBitmap(bmp)
+
+                        video?.setVisibility(View.INVISIBLE);
+                    }
+                    else if (type == "video") {
+                        video?.setVideoPath(path)
+                        video?.start()
+
+                        img?.setVisibility(View.INVISIBLE);
+                    }
+                    else if (type == "sound") {
+                        sound?.setVolume(100f, 100f)
+                        sound?.setDataSource(path)
+                        sound?.prepare();
+                        sound?.start()
+                    }
+                }
+                else {
+                    //show not file
+                }
+            } catch (ex: Exception) {
+                Log.i(tag, ex.message.toString())
+            }
+        }
+    }
+
+    var mediaStopRunnable: Runnable = object: Runnable {
+        override fun run() {
+            video?.setVisibility(View.INVISIBLE);
+            img?.setVisibility(View.VISIBLE);
+
+            try {
+                if(video?.isPlaying() == true) video?.stopPlayback()
+                if(sound?.isPlaying() == true) sound?.stop()
+
+                img?.setImageDrawable(defaultDrawable)
+
+            } catch (ex: Exception) {
+                Log.i(tag, ex.message.toString())
+            }
+        }
+    }
+
+    val receiver: ResultReceiver = object : ResultReceiver(Handler()) {
+
+        override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
+
+            if (resultCode == ScheduleDownLoadService.downLoadflag) {
+                mediaService?.getMediaSchedule(resultData.getParcelableArrayList<VideoDetial>("schedules") as ArrayList<VideoDetial>)
+            }
+        }
+    }
+
+    fun setMediaPathType(path: String,type: String){
+        this.path = path
+        this.type = type
+    }
+
+    fun executeMediaPlay() {
+        this.runOnUiThread(mediaPlayRunnable)
+    }
+
+    fun executeMediaStop() {
+        this.runOnUiThread(mediaStopRunnable)
     }
 
     override fun onDestroy() {
