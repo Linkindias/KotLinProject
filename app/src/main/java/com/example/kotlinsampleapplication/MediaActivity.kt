@@ -49,13 +49,7 @@ class MediaActivity : AppCompatActivity()  {
             img = findViewById<View>(R.id.imageView1) as ImageView
             sound = MediaPlayer();
 
-            mediaService = MediaScheduleService(
-                this,
-                video!!,
-                img!!,
-                sound!!,
-                ContextCompat.getDrawable(this, R.drawable.netcore)
-            )
+            mediaService = MediaScheduleService(this, video!!, img!!, sound!!, ContextCompat.getDrawable(this, R.drawable.netcore)            )
 
             video?.setOnPreparedListener { video -> //cycle play
                 video.isLooping = true

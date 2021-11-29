@@ -52,6 +52,7 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.2.1'
     implementation 'org.nanohttpd:nanohttpd:2.2.0'
     implementation 'com.github.felHR85:UsbSerial:6.1.0'
+    implementation 'org.koin:koin-android:2.1.5'
 
     annotationProcessor 'androidx.room:room-compiler:2.2.1'
 
