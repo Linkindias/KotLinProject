@@ -7,21 +7,29 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.example.base.Common.Companion.hideBar
 import com.example.kotlinsampleapplication.base.HttpApiServer
 import com.example.kotlinsampleapplication.dal.media.MediaApi
+import com.example.kotlinsampleapplication.fragment.BlankFragment
+import com.example.kotlinsampleapplication.fragment.FullscreenFragment
 import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
     val tag: String = "MainActivity"
 
+    private val fullscreenFragment = FullscreenFragment()
+    private val blackFragment = BlankFragment()
+
     private var httpApiServer: HttpApiServer? = null
     private var mediaApi: MediaApi? = null
+
+    var fragments: MutableList<Fragment> = mutableListOf()
 
     companion object {
         val notification = "com.example.kotlinsampleapplication.webapi"
@@ -49,6 +57,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        hideBar(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -86,6 +97,44 @@ class MainActivity : AppCompatActivity() {
             startActivity(serialActivity)
         }
 
+        val btfFragment: Button = findViewById<View>(R.id.btfirstFragment) as Button
+        btfFragment.setOnClickListener {
+            val transaction = supportFragmentManager.beginTransaction()
+            var fullFragment = fragments.find { it == fullscreenFragment }
+
+            if (fullFragment == null) {
+                fragments.add(fullscreenFragment)
+                transaction.add(R.id.fragment_container, fullscreenFragment)
+            }
+            else {
+                fragments.forEach {
+                    transaction.hide(it)
+                }
+                transaction.show(fullFragment)
+            }
+            transaction.commit()
+        }
+        val btsFragment: Button = findViewById<View>(R.id.btsecondFragment) as Button
+        btsFragment.setOnClickListener {
+            val transaction = supportFragmentManager.beginTransaction()
+            var bFragment = fragments.find { it == blackFragment }
+
+            if (bFragment == null) {
+                fragments.add(blackFragment)
+                if (fragments.size > 0)
+                    transaction.replace(R.id.fragment_container, blackFragment)
+                else
+                    transaction.add(R.id.fragment_container, blackFragment)
+            }
+            else {
+                fragments.forEach {
+                    transaction.hide(it)
+                }
+                transaction.show(bFragment)
+            }
+            transaction.commit()
+        }
+
         try {
             mediaApi = MediaApi(this)
             httpApiServer = HttpApiServer(mediaApi!!, 8092)
@@ -101,6 +150,18 @@ class MainActivity : AppCompatActivity() {
         sendBroadcast(it)
     }
 
+    private fun addFragment(f: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(R.id.fragment_container, f)
+        transaction.commit()
+    }
+
+    private fun replaceFragment(f : Fragment){
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, f)
+        transaction.commit()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -109,3 +170,6 @@ class MainActivity : AppCompatActivity() {
         if (bocastReceiver != null) unregisterReceiver(bocastReceiver)
     }
 }
+
+
+

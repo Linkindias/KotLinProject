@@ -1,6 +1,8 @@
 package com.example.base
 
 import android.os.Environment
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.room.TypeConverter
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,6 +30,14 @@ class Common {
         @JvmStatic
         fun dateToString(value: Date): String {
             return sdf.format(value)
+        }
+
+        @JvmStatic
+        fun hideBar(activity: AppCompatActivity) {
+            val flags = View.SYSTEM_UI_FLAG_LOW_PROFILE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            activity.window?.decorView?.systemUiVisibility = flags
+            activity.supportActionBar?.hide()
         }
     }
 }

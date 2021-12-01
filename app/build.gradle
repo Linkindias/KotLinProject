@@ -31,6 +31,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 apply plugin: "com.android.application"
@@ -39,6 +42,7 @@ apply plugin: "kotlin-parcelize"
 apply plugin: "kotlin-kapt"
 
 dependencies {
+    compile project(path: ':base')
     implementation project(path: ':base')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -53,6 +57,8 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.2.0'
     implementation 'com.github.felHR85:UsbSerial:6.1.0'
     implementation 'org.koin:koin-android:2.1.5'
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     annotationProcessor 'androidx.room:room-compiler:2.2.1'
 

@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.base.Common.Companion.hideBar
 import com.example.kotlinsampleapplication.MediaDomain.MediaScheduleService
 import com.example.kotlinsampleapplication.Service.ScheduleDownLoadService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
@@ -41,6 +42,9 @@ class MediaActivity : AppCompatActivity()  {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
+
+        hideBar(this)
+
         defaultDrawable = ContextCompat.getDrawable(this, R.drawable.netcore)
 
         try {

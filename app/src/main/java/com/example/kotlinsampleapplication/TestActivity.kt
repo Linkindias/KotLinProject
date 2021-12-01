@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.example.base.Common.Companion.hideBar
 import com.example.base.HttpService
 import com.example.kotlinsampleapplication.MainActivity.Companion.notification
 import com.example.kotlinsampleapplication.Model.WeatherModel
@@ -47,6 +48,8 @@ class TestActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
+
+        hideBar(this)
 
         registerReceiver(bocastReceiver, IntentFilter(notification))
 

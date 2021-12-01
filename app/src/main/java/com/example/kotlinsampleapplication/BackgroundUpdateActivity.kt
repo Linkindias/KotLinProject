@@ -9,6 +9,7 @@ import android.os.IBinder
 import com.example.kotlinsampleapplication.Service.PullService
 import com.example.kotlinsampleapplication.Service.PullService.LocalBinder
 import android.content.Intent
+import com.example.base.Common.Companion.hideBar
 
 class BackgroundUpdateActivity : AppCompatActivity() {
 
@@ -33,6 +34,8 @@ class BackgroundUpdateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_background_update)
+
+        hideBar(this)
 
         val serviceIntent = Intent(this, PullService::class.java)
         this.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)

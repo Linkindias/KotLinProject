@@ -6,6 +6,7 @@ import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import com.example.base.Common.Companion.hideBar
 import com.example.base.Common.Companion.sdf
 import com.example.kotlinsampleapplication.dal.media.MediaDBHelper
 import com.example.kotlinsampleapplication.dal.media.MediaEntity
@@ -23,6 +24,8 @@ class RoomActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_room)
+
+        hideBar(this)
 
         val et: EditText = findViewById<View>(R.id.etVideo) as EditText
 

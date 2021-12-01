@@ -8,8 +8,8 @@ import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.base.Common.Companion.hideBar
 import com.felhr.usbserial.UsbSerialDevice
-import com.felhr.usbserial.UsbSerialInterface
 
 class SerialActivity : AppCompatActivity() {
     lateinit var usbManager: UsbManager
@@ -22,6 +22,8 @@ class SerialActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serial)
+
+        hideBar(this)
     }
 
     private fun startUsbConnection() {
