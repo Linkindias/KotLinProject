@@ -2,6 +2,8 @@ package com.example.kotlinsampleapplication.dal.media
 
 import android.util.Log
 import androidx.annotation.WorkerThread
+import com.example.base.Common.Companion.errorFlag
+import com.example.base.Common.Companion.successFlag
 import java.util.*
 
 class MediaRepository(val mediaDao:MediaDao) {
@@ -71,6 +73,7 @@ class MediaRepository(val mediaDao:MediaDao) {
     @WorkerThread
     fun update(media: MediaEntity): String {
         var result = mediaDao.update(media)
+        Log.i(tag, "update:"+ result)
         return ""
     }
 
@@ -87,23 +90,23 @@ class MediaRepository(val mediaDao:MediaDao) {
                 fileNames.add(it.fileName)
         }
 
-        if (fileNames.size > 0) return "error${fileNames.joinToString(separator = ",")}"
-        return "success"
+        if (fileNames.size > 0) return "${errorFlag}${fileNames.joinToString(separator = ",")}"
+        return successFlag
     }
 
     private fun checkUpdateDB(changeMedia: MediaEntity): String {
         var mediasUpdate = mediaDao.getMediaByVariable("%", changeMedia.fileName, "%")
         if (mediasUpdate.isNotEmpty() && mediasUpdate[0].path == changeMedia.path && mediasUpdate[0].type == changeMedia.type &&
             mediasUpdate[0].startDate == changeMedia.startDate && mediasUpdate[0].endDate == changeMedia.endDate)
-            return "success"
+            return successFlag
 
-        return "error"
+        return errorFlag
     }
 
     private fun checkDeleteDB(fileName: String): String {
         var mediasUpdate = mediaDao.getMediaByVariable("%", fileName, "%")
 
-        if (mediasUpdate.isEmpty()) return "success"
-        return "error"
+        if (mediasUpdate.isEmpty()) return successFlag
+        return errorFlag
     }
 }

@@ -1,9 +1,14 @@
 package com.example.kotlinsampleapplication
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -13,8 +18,24 @@ import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
+    val tag: String = "MainActivity"
+
     private var httpApiServer: HttpApiServer? = null
     private var mediaApi: MediaApi? = null
+
+    companion object {
+        val notification = "com.example.kotlinsampleapplication.webapi"
+    }
+
+    var bocastReceiver: BroadcastReceiver? = object: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+
+            if(intent!!.getAction() == notification){
+                val loadType = intent!!.getStringExtra("loadType")
+                Log.i(tag, "onReceive:" + loadType)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -28,9 +49,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        registerReceiver(bocastReceiver, IntentFilter(notification))
 
         val btActivity: Button = findViewById<View>(R.id.btActivity) as Button
         btActivity.setOnClickListener {
@@ -52,6 +74,12 @@ class MainActivity : AppCompatActivity() {
             val serialActivity = Intent(this, SerialActivity::class.java)
             startActivity(serialActivity)
         }
+        val btReceiver: Button = findViewById<View>(R.id.btReceiver) as Button
+        btReceiver.setOnClickListener {
+            val it = Intent(notification)
+            it.putExtra("loadType", "media")
+            sendBroadcast(it)
+        }
 
         try {
             mediaApi = MediaApi(this)
@@ -62,9 +90,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun sendBoardCast(type:String){
+        val it = Intent(notification)
+        it.putExtra("loadType", type)
+        sendBroadcast(it)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
         if(httpApiServer != null) httpApiServer!!.stop();
+        if (mediaApi != null) mediaApi = null
+        if (bocastReceiver != null) unregisterReceiver(bocastReceiver)
     }
 }

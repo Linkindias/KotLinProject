@@ -43,9 +43,14 @@ class SerialActivity : AppCompatActivity() {
                 serial = UsbSerialDevice.createUsbSerialDevice(device, connection)
                 if (serial != null) {
                     if (serial!!.open()){
-                        serial!!.setBaudRate(9600)
-                        serial!!.setDataBits(UsbSerialInterface.DATA_BITS_8)
-//                        serial!!.setStopBits(usb)
+//                        serial!!.setBaudRate(serialParameters.baudRate);
+//                        serial!!.setDataBits(serialParameters.databits);
+//                        serial!!.setStopBits(serialParameters.stopbits);
+//                        serial!!.setParity(serialParameters.parity);
+//                        serial!!.setFlowControl(serialParameters.flowControl);
+//                        if (connection != null) {
+//                            connection.onConnected();
+//                        }
                     }
                 }
             }

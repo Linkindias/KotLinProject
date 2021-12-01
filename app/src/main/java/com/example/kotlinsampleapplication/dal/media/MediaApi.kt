@@ -2,7 +2,10 @@ package com.example.kotlinsampleapplication.dal.media
 
 import android.content.Context
 import android.util.Log
+import com.example.base.Common
 import com.example.base.Common.Companion.sdf
+import com.example.base.Common.Companion.successFlag
+import com.example.kotlinsampleapplication.MainActivity
 import com.example.kotlinsampleapplication.Model.MediaCModel
 import com.example.kotlinsampleapplication.Model.MediaCUModel
 import com.example.kotlinsampleapplication.Model.MediaDModel
@@ -12,76 +15,53 @@ import java.util.*
 
 class MediaApi {
     val tag: String = "MediaApi"
-    var context: Context? = null
+    var mainActivity: MainActivity? = null
 
-    constructor(activity: Context ){
-        context = activity
+    constructor(activity: MainActivity ){
+        mainActivity = activity
     }
 
     val videoRepo: MediaRepository by lazy {
-        MediaRepository(MediaDBHelper.getDatabase(this.context).mediaDao()!!)
+        MediaRepository(MediaDBHelper.getDatabase(this.mainActivity).mediaDao()!!)
     }
 
     fun findActionMethod(url:List<String>,para:Map<String, String>): String{
 
         when {
+            url[2] == "setMediaLoad" -> {
+                mainActivity!!.sendBoardCast("Media")
+                return Gson().toJson(successFlag)
+            }
             url[2].equals("getAll") -> {
-                return getMediaSchedules()
+                return Gson().toJson(videoRepo.getAll())
             }
             url[2].equals("getType") -> {
-                return getMediaSchedulesByType(para["type"]!!)
+                return Gson().toJson(videoRepo.getMediaByType(para["type"]!!))
             }
             url[2].equals("getPath") -> {
-                return getMediaSchedulesByPath(para["path"]!!)
+                return Gson().toJson(videoRepo.getMediaByPath(para["path"]!!))
             }
             url[2].equals("getFileName") -> {
-                return getMediaSchedulesByFileName(para["fileName"]!!)
+                return Gson().toJson(videoRepo.getMediaByFileName(para["fileName"]!!))
             }
             url[2].equals("insertMedia") -> {
                 var medias = Gson().fromJson(para.get("postData").toString(), MediaCModel::class.java)
-                return insertMediaSchedules(medias.info)
+
+                var mediaEntitys:MutableList<MediaEntity> = mutableListOf()
+                medias.info.forEach {
+                    mediaEntitys.add(MediaEntity(it.fileName,it.type, it.path, sdf.parse(it.startDate),sdf.parse(it.endDate)))
+                }
+                return Gson().toJson(videoRepo.insertMediaSchedule(mediaEntitys))
             }
             url[2].equals("updateMedia") -> {
                 var media = Gson().fromJson(para.get("postData").toString(), MediaCUModel::class.java)
-                return updateMediaScheduleByPara(media.path,media.type,media.fileName,sdf.parse(media.startDate), sdf.parse(media.endDate))
+                return Gson().toJson(videoRepo.updateMediaSchedule(media.path,media.type,media.fileName,sdf.parse(media.startDate), sdf.parse(media.endDate)))
             }
             url[2].equals("deleteMedia") -> {
                 var media = Gson().fromJson(para.get("postData").toString(), MediaDModel::class.java)
-                return deleteMediaScheduleByFileName(media.fileName)
+                return Gson().toJson(videoRepo.deleteMediaSchedule(media.fileName))
             }
-            else -> return ""
+            else -> return "{ 'msg': 'not method' }"
         }
-    }
-
-    private fun getMediaSchedules(): String {
-        return Gson().toJson(videoRepo.getAll())
-    }
-
-    private fun getMediaSchedulesByType(type:String): String {
-        return Gson().toJson(videoRepo.getMediaByType(type))
-    }
-
-    private fun getMediaSchedulesByPath(path:String): String {
-        return Gson().toJson(videoRepo.getMediaByPath(path))
-    }
-
-    private fun getMediaSchedulesByFileName(fileName:String): String {
-        return Gson().toJson(videoRepo.getMediaByFileName(fileName))
-    }
-
-    private fun insertMediaSchedules(medias: Array<MediaCUModel>): String {
-        var mediaEntitys:MutableList<MediaEntity> = mutableListOf()
-        medias.forEach {
-            mediaEntitys.add(MediaEntity(it.fileName,it.type, it.path, sdf.parse(it.startDate),sdf.parse(it.endDate)))
-        }
-        return Gson().toJson(videoRepo.insertMediaSchedule(mediaEntitys))
-    }
-
-    private fun updateMediaScheduleByPara(path: String, type: String, fileName: String, startDate: Date, endDate: Date): String {
-        return Gson().toJson(videoRepo.updateMediaSchedule(path, type, fileName, startDate, endDate))
-    }
-
-    private fun deleteMediaScheduleByFileName(fileName: String): String {
-        return Gson().toJson(videoRepo.deleteMediaSchedule(fileName))
     }
 }

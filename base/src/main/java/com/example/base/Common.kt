@@ -15,6 +15,8 @@ class Common {
         val mediaDownloadApi = "$domainUrl/webapplication/api/video/DownLoadFile?fileName="
         val sdcardDownLoad = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val jsonType = "application/json"
+        val successFlag: String = "{ 'msg': 'success' }"
+        val errorFlag: String = "{ 'msg': 'error' }"
 
         @TypeConverter
         @JvmStatic

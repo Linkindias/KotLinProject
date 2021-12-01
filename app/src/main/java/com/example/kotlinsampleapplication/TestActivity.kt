@@ -1,5 +1,9 @@
 package com.example.kotlinsampleapplication
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -9,15 +13,13 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.example.base.HttpService
+import com.example.kotlinsampleapplication.MainActivity.Companion.notification
 import com.example.kotlinsampleapplication.Model.WeatherModel
 import com.example.kotlinsampleapplication.ViewModel.WeatherInfo
 import com.google.gson.Gson
 import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 class TestActivity : AppCompatActivity() {
     var tag: String = "TestActivity"
@@ -28,6 +30,16 @@ class TestActivity : AppCompatActivity() {
     val startDate = SimpleDateFormat("yyyy-MM-dd HH:mm ")
     val endDate = SimpleDateFormat(" HH:mm")
 
+    var bocastReceiver: BroadcastReceiver? = object: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+
+            if(intent!!.getAction() == notification){
+                val loadType = intent!!.getStringExtra("loadType")
+                Log.i(tag, "onReceive:" + loadType)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i(tag,"TestActivity start")
         hs = HttpService()
@@ -35,6 +47,8 @@ class TestActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
+
+        registerReceiver(bocastReceiver, IntentFilter(notification))
 
         val weather: Button = findViewById<View>(R.id.btWeather) as Button
         weather.setOnClickListener(listener);
@@ -49,6 +63,11 @@ class TestActivity : AppCompatActivity() {
         postForm.setOnClickListener(listener);
 
         editShow = findViewById<View>(R.id.editTextTextMultiLine) as EditText
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (bocastReceiver != null) unregisterReceiver(bocastReceiver)
     }
 
     val listener = View.OnClickListener { view ->
