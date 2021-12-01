@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(dbActivity)
         }
         val btSerial: Button = findViewById<View>(R.id.btSerial) as Button
-        btRoomdb.setOnClickListener {
+        btSerial.setOnClickListener {
             val serialActivity = Intent(this, SerialActivity::class.java)
             startActivity(serialActivity)
         }
@@ -79,6 +79,11 @@ class MainActivity : AppCompatActivity() {
             val it = Intent(notification)
             it.putExtra("loadType", "media")
             sendBroadcast(it)
+        }
+        val btService: Button = findViewById<View>(R.id.btService) as Button
+        btService.setOnClickListener {
+            val serialActivity = Intent(this, BackgroundUpdateActivity::class.java)
+            startActivity(serialActivity)
         }
 
         try {

@@ -4,13 +4,15 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 
 class PullService : Service() {
-
+    private val tag: String = "PullService"
     private val binder = LocalBinder()
 
     override fun onCreate() {
         super.onCreate()
+        Log.i(tag, "PullService start")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -28,5 +30,10 @@ class PullService : Service() {
     inner class LocalBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
         fun getService(): PullService = this@PullService
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i(tag, "PullService stop")
     }
 }

@@ -29,7 +29,7 @@ class ScheduleDownLoadService : IntentService("single") {
     var schedulsList: List <VideoDetial> = listOf()
 
     override fun onHandleIntent(intent: Intent?) {
-
+        Log.i(tag,"ScheduleDownLoadService start")
         try {
             getServerSchedules()
 
@@ -114,8 +114,10 @@ class ScheduleDownLoadService : IntentService("single") {
         }
     }
 
-    override fun onDestroy() {
+
+    public override fun onDestroy () {
         super.onDestroy()
+        Log.i(tag,"ScheduleDownLoadService stop")
     }
 }
 
