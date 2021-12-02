@@ -12,7 +12,11 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.base.Common.Companion.domain
+import com.example.base.Common.Companion.url
 import com.example.base.Common.Companion.hideBar
+import com.example.base.Common.Companion.mediaScheduleApi
+import com.example.base.Common.Companion.ping
 import com.example.kotlinsampleapplication.base.HttpApiServer
 import com.example.kotlinsampleapplication.dal.media.MediaApi
 import com.example.kotlinsampleapplication.fragment.BlankFragment
@@ -62,6 +66,8 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Log.i(tag,"ping:" + ping()) //
 
         registerReceiver(bocastReceiver, IntentFilter(notification))
 
@@ -148,18 +154,6 @@ class MainActivity : AppCompatActivity() {
         val it = Intent(notification)
         it.putExtra("loadType", type)
         sendBroadcast(it)
-    }
-
-    private fun addFragment(f: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(R.id.fragment_container, f)
-        transaction.commit()
-    }
-
-    private fun replaceFragment(f : Fragment){
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, f)
-        transaction.commit()
     }
 
     override fun onDestroy() {

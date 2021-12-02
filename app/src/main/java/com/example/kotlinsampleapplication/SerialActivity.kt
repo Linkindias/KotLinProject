@@ -10,11 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.base.Common.Companion.hideBar
 import com.felhr.usbserial.UsbSerialDevice
+import com.felhr.usbserial.UsbSerialInterface
 
 class SerialActivity : AppCompatActivity() {
     lateinit var usbManager: UsbManager
     var device: UsbDevice? = null
-    var serial: UsbSerialDevice? = null
+    var serialPort: UsbSerialDevice? = null
     var connection: UsbDeviceConnection? = null
 
     val ACTION_USB_PERMISSION = "permission"
@@ -42,20 +43,20 @@ class SerialActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if(intent?.action!! == ACTION_USB_PERMISSION) {
                 connection = usbManager.openDevice(device)
-                serial = UsbSerialDevice.createUsbSerialDevice(device, connection)
-                if (serial != null) {
-                    if (serial!!.open()){
-//                        serial!!.setBaudRate(serialParameters.baudRate);
-//                        serial!!.setDataBits(serialParameters.databits);
-//                        serial!!.setStopBits(serialParameters.stopbits);
-//                        serial!!.setParity(serialParameters.parity);
-//                        serial!!.setFlowControl(serialParameters.flowControl);
-//                        if (connection != null) {
-//                            connection.onConnected();
-//                        }
-                    }
+                serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection)
+                if (serialPort != null && serialPort!!.open()) {
+                    serialPort!!.setBaudRate(115200);
+                    serialPort!!.setDataBits(UsbSerialInterface.DATA_BITS_8);
+                    serialPort!!.setStopBits(UsbSerialInterface.STOP_BITS_1);
+                    serialPort!!.setParity(UsbSerialInterface.PARITY_NONE);
+                    serialPort!!.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+//                    serialPort!!.read(mCallback);
+//                    if (connection != null) {
+//                        connection.onConnected();
+//                    }
                 }
             }
         }
+
     }
 }
