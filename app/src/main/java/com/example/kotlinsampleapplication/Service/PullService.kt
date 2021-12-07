@@ -16,10 +16,12 @@ class PullService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.i(tag, "onStartCommand ")
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent): IBinder {
+        Log.i(tag, "onBind ")
         return binder
     }
 

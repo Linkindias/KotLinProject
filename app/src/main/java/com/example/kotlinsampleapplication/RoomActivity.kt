@@ -1,5 +1,6 @@
 package com.example.kotlinsampleapplication
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -84,5 +85,9 @@ class RoomActivity : AppCompatActivity() {
                 }
             }.start()
         }
+
+        val it = Intent(MainActivity.notification)
+        it.putExtra("loadType", "Room")
+        sendBroadcast(it)
     }
 }

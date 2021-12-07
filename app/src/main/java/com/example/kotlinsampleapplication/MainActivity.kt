@@ -1,5 +1,6 @@
 package com.example.kotlinsampleapplication
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,17 +13,14 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.base.Common.Companion.domain
-import com.example.base.Common.Companion.url
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.base.Common.Companion.hideBar
-import com.example.base.Common.Companion.mediaScheduleApi
 import com.example.base.Common.Companion.ping
 import com.example.kotlinsampleapplication.base.HttpApiServer
 import com.example.kotlinsampleapplication.dal.media.MediaApi
 import com.example.kotlinsampleapplication.fragment.BlankFragment
 import com.example.kotlinsampleapplication.fragment.FullscreenFragment
 import java.io.IOException
-
 
 class MainActivity : AppCompatActivity() {
     val tag: String = "MainActivity"
@@ -37,9 +35,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val notification = "com.example.kotlinsampleapplication.webapi"
+        val localNotify = "com.example.kotlinsampleapplication.test"
     }
 
-    var bocastReceiver: BroadcastReceiver? = object: BroadcastReceiver() {
+    var bocastReceiver: BroadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
 
             if(intent!!.getAction() == notification){
@@ -49,11 +48,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    var testBocastReceiver: BroadcastReceiver = object: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+
+            if(intent!!.getAction() == localNotify){
+                val event = intent!!.getStringExtra("key")
+                Log.i(tag, "onReceive:" + event)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         if (Build.VERSION.SDK_INT >= 23) {
             val REQUEST_CODE_CONTACT = 101
-            val permissions = arrayOf<String>(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val permissions = arrayOf<String>(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
             for (str in permissions) {
                 if (checkSelfPermission(str!!) != PackageManager.PERMISSION_GRANTED) {
@@ -67,7 +76,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Log.i(tag,"ping:" + ping()) //
+        Log.i(tag,"ping:" + ping())
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(testBocastReceiver, IntentFilter(localNotify))
 
         registerReceiver(bocastReceiver, IntentFilter(notification))
 
@@ -162,6 +173,7 @@ class MainActivity : AppCompatActivity() {
         if(httpApiServer != null) httpApiServer!!.stop();
         if (mediaApi != null) mediaApi = null
         if (bocastReceiver != null) unregisterReceiver(bocastReceiver)
+        if (testBocastReceiver != null) LocalBroadcastManager.getInstance(this).unregisterReceiver(testBocastReceiver)
     }
 }
 

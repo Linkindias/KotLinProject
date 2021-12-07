@@ -7,12 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import com.example.kotlinsampleapplication.Service.PullService
-import com.example.kotlinsampleapplication.Service.PullService.LocalBinder
 import android.content.Intent
+import android.util.Log
 import com.example.base.Common.Companion.hideBar
 
 class BackgroundUpdateActivity : AppCompatActivity() {
-
+    private val tag: String = "BackgroundUpdateActivity"
     private lateinit var mService: PullService
     private var mBound: Boolean = false
 
@@ -21,7 +21,7 @@ class BackgroundUpdateActivity : AppCompatActivity() {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as LocalBinder
+            val binder = service as PullService.LocalBinder
             mService = binder.getService()
             mBound = true
         }

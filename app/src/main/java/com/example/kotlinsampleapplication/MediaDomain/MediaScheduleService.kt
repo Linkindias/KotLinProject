@@ -1,17 +1,9 @@
 package com.example.kotlinsampleapplication.MediaDomain
 
-import android.graphics.drawable.Drawable
-import android.media.MediaPlayer
 import android.util.Log
-import android.widget.ImageView
-import android.widget.VideoView
-import com.example.base.Common
 import com.example.base.Common.Companion.sdf
-import com.example.base.HttpService
 import com.example.kotlinsampleapplication.MediaActivity
-import com.example.kotlinsampleapplication.Service.ScheduleDownLoadService.Companion.downloadErrorList
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
-import java.io.File
 import java.util.*
 
 class MediaScheduleService {

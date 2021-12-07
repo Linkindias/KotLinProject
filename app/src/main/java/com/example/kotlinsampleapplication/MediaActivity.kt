@@ -14,13 +14,16 @@ import android.widget.ImageView
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.base.Common.Companion.hideBar
+import com.example.kotlinsampleapplication.MainActivity.Companion.localNotify
 import com.example.kotlinsampleapplication.MediaDomain.MediaScheduleService
 import com.example.kotlinsampleapplication.Service.ScheduleDownLoadService
 import com.example.kotlinsampleapplication.ViewModel.VideoDetial
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
+import javax.inject.Inject
 
 
 class MediaActivity : AppCompatActivity()  {
@@ -31,6 +34,7 @@ class MediaActivity : AppCompatActivity()  {
     var sound: MediaPlayer? = null
 
     var serviceIntent: Intent? = null
+
     var mediaService: MediaScheduleService? = null
 
     var path: String = ""
@@ -84,6 +88,10 @@ class MediaActivity : AppCompatActivity()  {
         } catch (e: Exception) {
             Log.i(tag, e.message.toString())
         }
+
+        var i = Intent(localNotify)
+        i.putExtra("key","this is an event")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i)
     }
 
     var mediaPlayRunnable: Runnable = object: Runnable {
