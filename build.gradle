@@ -21,6 +21,7 @@ allprojects {
         jcenter() // Warning: this repository is going to shut down soon
         google()
         maven { url "https://jitpack.io"}
+        mavenCentral() // since 2.1.3
     }
 }
 

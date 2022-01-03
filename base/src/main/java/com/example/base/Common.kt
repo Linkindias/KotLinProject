@@ -1,6 +1,7 @@
 package com.example.base
 
 import android.os.Environment
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.TypeConverter
@@ -9,10 +10,14 @@ import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 import java.lang.Exception
+import java.lang.RuntimeException
 
 
 class Common {
+
     companion object {
+        var tag: String = "Common"
+
         val sdfJson = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
@@ -20,6 +25,7 @@ class Common {
         val url = "http://$domain"
         val mediaScheduleApi = "$url/webapplication/api/video/FileSchedule"
         val mediaDownloadApi = "$url/webapplication/api/video/DownLoadFile?fileName="
+        val apk = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val sdcardDownLoad = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val jsonType = "application/json"
         val successFlag: String = "{ 'msg': 'success' }"
@@ -47,8 +53,14 @@ class Common {
 
         @JvmStatic
         fun ping(): Boolean {
-            try {
-                val p: Process = Runtime.getRuntime().exec("ping -c 1 -w 2000 $domain")
+            var result = execCommand("ping -c 1 -w 2000 $domain")
+            return result.indexOf(domain) > -1;
+        }
+
+        @JvmStatic
+        fun execCommand(command: String): String {
+            return try {
+                val p: Process = Runtime.getRuntime().exec(command)
                 val bufferReader = BufferedReader(InputStreamReader(p.inputStream))
                 var inputLine: String? = ""
                 var pingResult = StringBuffer()
@@ -56,11 +68,11 @@ class Common {
                     pingResult.append(inputLine)
                 }
                 bufferReader.close()
-                return pingResult.indexOf(domain) > -1;
+                pingResult.toString();
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(tag, e.message.toString())
+                e.message.toString()
             }
-            return false
         }
     }
 }

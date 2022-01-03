@@ -1,12 +1,14 @@
-package com.example.kotlinsampleapplication.dal.media
+package com.example.kotlinsampleapplication.repository
 
 import android.util.Log
 import androidx.annotation.WorkerThread
 import com.example.base.Common.Companion.errorFlag
 import com.example.base.Common.Companion.successFlag
+import com.example.kotlinsampleapplication.dal.media.MediaDao
+import com.example.kotlinsampleapplication.dal.media.MediaEntity
 import java.util.*
 
-class MediaRepository(val mediaDao:MediaDao) {
+class MediaRepository(val mediaDao: MediaDao) {
     val tag: String = "MediaRepository"
 
     @Suppress("RedundantSuspendModifier")

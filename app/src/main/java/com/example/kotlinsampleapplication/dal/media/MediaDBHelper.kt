@@ -29,7 +29,7 @@ abstract class MediaDBHelper: RoomDatabase() {
 
         fun getDatabase(context: Context?): MediaDBHelper {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(context!!, MediaDBHelper::class.java,"mediaInfo" )
+                val instance = Room.databaseBuilder(context!!, MediaDBHelper::class.java,"mediaInfo.db" )
                                     .addMigrations(migration2)
                                     .build()
                 INSTANCE = instance

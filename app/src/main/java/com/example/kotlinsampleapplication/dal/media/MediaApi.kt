@@ -1,16 +1,13 @@
 package com.example.kotlinsampleapplication.dal.media
 
-import android.content.Context
-import android.util.Log
-import com.example.base.Common
 import com.example.base.Common.Companion.sdf
 import com.example.base.Common.Companion.successFlag
 import com.example.kotlinsampleapplication.MainActivity
 import com.example.kotlinsampleapplication.Model.MediaCModel
 import com.example.kotlinsampleapplication.Model.MediaCUModel
 import com.example.kotlinsampleapplication.Model.MediaDModel
+import com.example.kotlinsampleapplication.repository.MediaRepository
 import com.google.gson.Gson
-import java.util.*
 
 
 class MediaApi {

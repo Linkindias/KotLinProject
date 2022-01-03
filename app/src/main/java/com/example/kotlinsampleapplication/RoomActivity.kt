@@ -11,7 +11,7 @@ import com.example.base.Common.Companion.hideBar
 import com.example.base.Common.Companion.sdf
 import com.example.kotlinsampleapplication.dal.media.MediaDBHelper
 import com.example.kotlinsampleapplication.dal.media.MediaEntity
-import com.example.kotlinsampleapplication.dal.media.MediaRepository
+import com.example.kotlinsampleapplication.repository.MediaRepository
 
 class RoomActivity : AppCompatActivity() {
     val tag: String = "RoomActivity"
