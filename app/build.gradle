@@ -42,7 +42,7 @@ apply plugin: "kotlin-parcelize"
 apply plugin: "kotlin-kapt"
 
 dependencies {
-    implementation files('C:\\Users\\ccchiu\\Downloads\\CH341SER_ANDROID\\CH341SER_ANDROID\\lib\\CH34xUARTDriver.jar')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':base')
     implementation project(path: ':base')
 
