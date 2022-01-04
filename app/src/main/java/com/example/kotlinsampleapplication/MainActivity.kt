@@ -237,7 +237,7 @@ class MainActivity : AppCompatActivity() {
                     if (driver!!.SetConfig(9600, 8, 1, 0, 0)) //設定參數
                     {
                         driver!!.WriteData(to_send, to_send.size); //發送訊號
-                        Log.i(tag,"Open writeData")
+//                        Log.i(tag,"Open writeData")
                         driver!!.CloseDevice();
                     }
                 }
@@ -255,7 +255,7 @@ class MainActivity : AppCompatActivity() {
                     if (driver!!.SetConfig(9600, 8, 1, 0, 0)) //設定參數
                     {
                         driver!!.WriteData(to_send, to_send.size); //發送訊號
-                        Log.i(tag,"close writeData")
+//                        Log.i(tag,"close writeData")
                         driver!!.CloseDevice();
                     }
                 }

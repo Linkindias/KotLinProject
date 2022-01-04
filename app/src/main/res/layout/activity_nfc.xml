@@ -5,15 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".NfcActivity">
+
     <EditText
         android:id="@+id/edit_test_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textUri"
-        android:textSize="18dp"
-        android:textColor="@null"
         android:background="@null"
         android:hint=""
+        android:inputType="textUri"
+        android:text=""
+        android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
